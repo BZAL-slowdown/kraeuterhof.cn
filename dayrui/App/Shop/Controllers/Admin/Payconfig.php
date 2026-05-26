@@ -57,7 +57,7 @@ class Payconfig extends \Phpcmf\App
         $content .= "        'merchant_private_key' => ".$this->exportPath($this->postOrOld('alipay_app_private_key', $oldAlipay['app_private_key'] ?? $oldAlipay['merchant_private_key'] ?? '') ?: "WRITEPATH.'pay/alipay/app_private_key.pem'").",\n";
         $content .= "        'app_public_key' => ".$this->exportPath($this->postOrOld('alipay_app_public_key', $oldAlipay['app_public_key'] ?? '') ?: "WRITEPATH.'pay/alipay/app_public_key.pem'").",\n";
         $content .= "        'alipay_public_key' => ".$this->exportPath($this->postOrOld('alipay_public_key', $oldAlipay['alipay_public_key'] ?? '') ?: "WRITEPATH.'pay/alipay/alipay_public_key.pem'").",\n";
-        $content .= "        'notify_url' => ".$this->exportUrl($this->postOrOld('alipay_notify_url', $oldAlipay['notify_url'] ?? '') ?: "SITE_URL.'index.php?s=shop&c=pay&m=alipay_notify'").",\n";
+        $content .= "        'notify_url' => ".$this->exportUrl($this->postOrOld('alipay_notify_url', $oldAlipay['notify_url'] ?? '') ?: "SITE_URL.'alipay_notify.php'").",\n";
         $content .= "        'return_url' => ".$this->exportUrl($this->postOrOld('alipay_return_url', $oldAlipay['return_url'] ?? '') ?: "SITE_URL.'index.php?s=shop&c=pay&m=alipay_return&out_trade_no={out_trade_no}'").",\n";
         $content .= "        'gateway' => ".$this->exportString($this->postOrOld('alipay_gateway', $oldAlipay['gateway'] ?? '') ?: 'https://openapi.alipay.com/gateway.do').",\n";
         $content .= "        'product_code' => ".$this->exportString($this->postOrOld('alipay_product_code', $oldAlipay['product_code'] ?? '') ?: 'QUICK_WAP_WAY').",\n";

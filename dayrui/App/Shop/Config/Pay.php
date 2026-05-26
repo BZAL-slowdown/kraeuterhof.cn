@@ -26,7 +26,7 @@ return [
         'merchant_private_key' => WRITEPATH.'pay/alipay/app_private_key.pem',
         'app_public_key' => WRITEPATH.'pay/alipay/app_public_key.pem',
         'alipay_public_key' => WRITEPATH.'pay/alipay/alipay_public_key.pem',
-        'notify_url' => SITE_URL.'index.php?s=shop&c=pay&m=alipay_notify',
+        'notify_url' => SITE_URL.'alipay_notify.php',
         'return_url' => SITE_URL.'index.php?s=shop&c=pay&m=alipay_return&out_trade_no={out_trade_no}',
         'gateway' => 'https://openapi.alipay.com/gateway.do',
         'product_code' => 'QUICK_WAP_WAY',
