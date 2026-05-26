@@ -27,8 +27,8 @@ class WechatH5
                 'payer_client_ip' => $order['client_ip'],
                 'h5_info' => [
                     'type' => $this->config['scene_info']['type'] ?: 'Wap',
-                    'wap_url' => $this->config['scene_info']['wap_url'] ?: SITE_URL,
-                    'wap_name' => $this->config['scene_info']['wap_name'] ?: SITE_NAME,
+                    'app_url' => $this->config['scene_info']['wap_url'] ?: SITE_URL,
+                    'app_name' => $this->config['scene_info']['wap_name'] ?: SITE_NAME,
                 ],
             ],
         ];
