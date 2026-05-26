@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>会员中心 - 七叶庄园</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#f3f6f4;color:#1f2f25;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif}
+    a{color:inherit;text-decoration:none}
+    .top{background:#fff;border-bottom:1px solid #e1e7e3}
+    .top-inner{max-width:1200px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .logo img{height:52px;width:auto;display:block}
+    .nav{display:flex;align-items:center;gap:8px;color:#4c5f52;font-size:14px;white-space:nowrap}
+    .nav a{height:36px;display:inline-flex;align-items:center;padding:0 12px;border-radius:4px}
+    .nav a:hover,.nav .active{background:#eef5f0;color:#1c5231}
+    .wrap{max-width:1200px;margin:28px auto 68px;padding:0 24px}
+    .shell{display:grid;grid-template-columns:240px minmax(0,1fr);gap:22px}
+    .side,.card,.hero,.order-row,.task{background:#fff;border:1px solid #e1e7e3;border-radius:8px;box-shadow:0 10px 28px rgba(28,82,49,.05)}
+    .side{height:max-content;padding:18px}
+    .member-mini{padding:10px 8px 18px;border-bottom:1px solid #edf1ee}
+    .avatar{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#eaf3ed;color:#1c5231;font-size:22px;font-weight:700;margin-bottom:12px;overflow:hidden}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .member-name{font-size:18px;font-weight:700;color:#173b27;word-break:break-all}
+    .member-tip{margin-top:6px;color:#7a8b80;font-size:13px}
+    .side-nav{display:grid;gap:6px;margin-top:16px}
+    .side-nav a{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-radius:4px;color:#43564a;font-size:14px}
+    .side-nav a:hover,.side-nav .active{background:#1c5231;color:#fff}
+    .main{min-width:0}
+    .hero{padding:28px;margin-bottom:18px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:22px;align-items:center}
+    .eyebrow{margin:0 0 8px;color:#6f8377;font-size:13px;letter-spacing:0;text-transform:uppercase}
+    h1{margin:0;color:#173b27;font-size:30px;line-height:1.25}
+    .intro{margin:12px 0 0;color:#63766a;line-height:1.8;font-size:15px}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .btn{height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 16px;border-radius:4px;background:#1c5231;color:#fff;font-size:14px;border:1px solid #1c5231}
+    .btn.secondary{background:#fff;color:#1c5231}.btn.ghost{background:#eef5f0;border-color:#eef5f0;color:#1c5231}
+    .btn:hover{filter:brightness(.97)}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .stat{background:#f8faf8;border:1px solid #e4ebe6;border-radius:6px;padding:18px}
+    .stat b{display:block;color:#1c5231;font-size:28px;line-height:1}.stat span{display:block;margin-top:10px;color:#6f8377;font-size:13px}
+    .grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px}
+    .card{padding:22px}
+    .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+    .card h2{margin:0;color:#173b27;font-size:21px;line-height:1.3}
+    .card small{display:block;margin-top:6px;color:#7a8b80;font-size:13px}
+    .link{color:#1c5231;font-size:14px;white-space:nowrap}
+    .address{display:grid;gap:10px;color:#374b40;line-height:1.7}
+    .address-row{display:grid;grid-template-columns:68px minmax(0,1fr);gap:10px}
+    .address-row span:first-child{color:#7a8b80}
+    .empty{padding:18px;border:1px dashed #cfdad3;background:#fafcfb;border-radius:6px;color:#6f8377;line-height:1.7}
+    .task-list{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+    .task{box-shadow:none;padding:16px;display:block}
+    .task b{display:block;color:#173b27;font-size:15px}.task span{display:block;margin-top:8px;color:#7a8b80;font-size:13px;line-height:1.6}
+    .order-list{display:grid;gap:10px}
+    .order-row{box-shadow:none;padding:14px 16px;display:grid;grid-template-columns:1.1fr .8fr auto;gap:14px;align-items:center}
+    .order-no{color:#1c5231;font-family:Arial,sans-serif;font-size:13px;word-break:break-all}.product{margin-top:6px;color:#263b2f;font-weight:600;line-height:1.5}
+    .muted{color:#7a8b80;font-size:13px;margin-top:5px}.money{font-weight:700;color:#b42318;white-space:nowrap}
+    .badge{display:inline-flex;height:26px;align-items:center;padding:0 10px;border-radius:999px;background:#eceff1;color:#546e7a;font-size:12px;white-space:nowrap}
+    .badge.ok{background:#e5f4ec;color:#147a46}.badge.warn{background:#fff3d6;color:#946200}
+    .notice{margin-top:18px;padding:16px 18px;border-radius:6px;background:#fff8e8;border:1px solid #f1dfb4;color:#725117;font-size:13px;line-height:1.8}
+    @media(max-width:980px){.shell,.hero,.grid{grid-template-columns:1fr}.side{order:2}.hero{display:block}.stats{margin-top:20px}.task-list{grid-template-columns:1fr}.order-row{grid-template-columns:1fr}}
+    @media(max-width:720px){.top-inner{align-items:flex-start;flex-direction:column;padding:18px}.nav{flex-wrap:wrap}.wrap{padding:0 16px}.logo img{height:46px}h1{font-size:25px}.stats{grid-template-columns:1fr}.card,.hero{padding:20px}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="logo" href="{SITE_URL}"><img src="/uploadfile/202512/c35e2de6b2eae6a.png" alt="七叶庄园"></a>
+      <nav class="nav">
+        <a href="{SITE_URL}">返回首页</a>
+        <a class="active" href="{SITE_URL}index.php?s=member&app=shop&c=center&m=index">会员中心</a>
+        <a href="{SITE_URL}index.php?s=member&app=shop&c=profile&m=index">个人资料</a>
+        <a href="{SITE_URL}index.php?s=member&app=shop&c=address&m=index">收货资料</a>
+        <a href="{SITE_URL}index.php?s=member&app=shop&c=order&m=index">我的订单</a>
+        <a href="{SITE_URL}index.php?s=shop&c=home&m=logout">退出登录</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="shell">
+      <aside class="side">
+        <div class="member-mini">
+          <div class="avatar">{if $profile.avatar}<img src="{$profile.avatar}" alt="会员头像">{else}会{/if}</div>
+          <div class="member-name">{$display_name}</div>
+          <div class="member-tip">七叶庄园会员账户</div>
+        </div>
+        <nav class="side-nav">
+          <a class="active" href="{SITE_URL}index.php?s=member&app=shop&c=center&m=index"><span>账户概览</span><span>›</span></a>
+          <a href="{SITE_URL}index.php?s=member&app=shop&c=profile&m=index"><span>个人资料</span><span>›</span></a>
+          <a href="{SITE_URL}index.php?s=member&app=shop&c=order&m=index"><span>我的订单</span><span>{$stats.order_count}</span></a>
+          <a href="{SITE_URL}index.php?s=member&app=shop&c=address&m=index"><span>收货资料</span><span>›</span></a>
+          <a href="{SITE_URL}"><span>继续选购</span><span>›</span></a>
+        </nav>
+      </aside>
+
+      <section class="main">
+        <div class="hero">
+          <div>
+            <p class="eyebrow">Member Dashboard</p>
+            <h1>你好，{$display_name}</h1>
+            <p class="intro">这里集中管理你的收货资料、订单状态和支付入口。保存默认收货资料后，登录购买商品时会自动带入，下单会更快。</p>
+            <div class="actions">
+              <a class="btn" href="{SITE_URL}index.php?s=member&app=shop&c=address&m=index">完善收货资料</a>
+              <a class="btn secondary" href="{SITE_URL}index.php?s=member&app=shop&c=profile&m=index">编辑个人资料</a>
+              <a class="btn secondary" href="{SITE_URL}index.php?s=member&app=shop&c=order&m=index">查看全部订单</a>
+              <a class="btn ghost" href="{SITE_URL}">继续选购</a>
+            </div>
+          </div>
+          <div class="stats">
+            <div class="stat"><b>{$stats.order_count}</b><span>全部订单</span></div>
+            <div class="stat"><b>{$stats.pending_pay_count}</b><span>待支付订单</span></div>
+            <div class="stat"><b>{$stats.paid_count}</b><span>已支付订单</span></div>
+          </div>
+        </div>
+
+        <div class="task-list">
+          <a class="task" href="{SITE_URL}index.php?s=member&app=shop&c=profile&m=index">
+            <b>编辑个人资料</b>
+            <span>上传头像，设置前台展示的用户名称。</span>
+          </a>
+          <a class="task" href="{SITE_URL}index.php?s=member&app=shop&c=address&m=index">
+            <b>完善收货资料</b>
+            <span>维护默认收货人、手机号和地址。</span>
+          </a>
+          <a class="task" href="{SITE_URL}index.php?s=member&app=shop&c=order&m=index">
+            <b>跟进订单</b>
+            <span>查看订单状态，未支付订单可继续支付。</span>
+          </a>
+          <a class="task" href="{SITE_URL}">
+            <b>继续选购</b>
+            <span>返回官网浏览产品系列和新品。</span>
+          </a>
+        </div>
+
+        <div class="grid">
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>默认收货资料</h2>
+                <small>用于登录后的快速下单</small>
+              </div>
+              <a class="link" href="{SITE_URL}index.php?s=member&app=shop&c=address&m=index">修改</a>
+            </div>
+            {if $address}
+            <div class="address">
+              <div class="address-row"><span>收货人</span><strong>{$address.buyer_name}</strong></div>
+              <div class="address-row"><span>手机号</span><strong>{$address.buyer_phone}</strong></div>
+              <div class="address-row"><span>地址</span><strong>{$address.buyer_address}</strong></div>
+            </div>
+            {else}
+            <div class="empty">还没有保存默认收货资料。建议先完善资料，后续购买时系统会自动带入。</div>
+            {/if}
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>最近订单</h2>
+                <small>展示最近 5 条订单记录</small>
+              </div>
+              <a class="link" href="{SITE_URL}index.php?s=member&app=shop&c=order&m=index">全部订单</a>
+            </div>
+            <div class="order-list">
+              {loop $orders $t}
+              <div class="order-row">
+                <div>
+                  <div class="order-no">{$t.out_trade_no}</div>
+                  <div class="product">{$t.product_title}</div>
+                </div>
+                <div>
+                  <div class="money">￥{$t.pay_amount}</div>
+                  <div class="muted">{dr_date($t.created_at, 'Y-m-d H:i')}</div>
+                </div>
+                <div>{if $t.pay_status}<span class="badge ok">已支付</span>{else}<span class="badge warn">待支付</span>{/if}</div>
+              </div>
+              {/loop}
+              {if !$orders}<div class="empty">暂无订单。你可以返回官网选择产品后进行购买。</div>{/if}
+            </div>
+          </section>
+        </div>
+
+        <div class="notice">提示：微信 H5 支付资料配置完成前，未支付订单会停留在待支付状态；配置完成后，可在“我的订单”中继续发起支付。</div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

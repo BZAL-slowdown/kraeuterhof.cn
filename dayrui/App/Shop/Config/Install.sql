@@ -1,0 +1,60 @@
+CREATE TABLE IF NOT EXISTS `{dbprefix}shop_order` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `siteid` smallint(5) unsigned NOT NULL DEFAULT '1',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0',
+  `out_trade_no` varchar(64) NOT NULL,
+  `product_mid` varchar(32) NOT NULL DEFAULT 'cp',
+  `product_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `product_title` varchar(255) NOT NULL DEFAULT '',
+  `product_thumb` varchar(255) NOT NULL DEFAULT '',
+  `sku` varchar(255) NOT NULL DEFAULT '',
+  `quantity` int(10) unsigned NOT NULL DEFAULT '1',
+  `unit_price` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `total_amount` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `pay_amount` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `pay_type` varchar(32) NOT NULL DEFAULT 'wechat_h5',
+  `pay_status` tinyint(1) NOT NULL DEFAULT '0',
+  `order_status` tinyint(1) NOT NULL DEFAULT '0',
+  `transaction_id` varchar(96) NOT NULL DEFAULT '',
+  `payer_openid` varchar(96) NOT NULL DEFAULT '',
+  `buyer_name` varchar(64) NOT NULL DEFAULT '',
+  `buyer_phone` varchar(32) NOT NULL DEFAULT '',
+  `buyer_address` varchar(255) NOT NULL DEFAULT '',
+  `remark` varchar(255) NOT NULL DEFAULT '',
+  `client_ip` varchar(64) NOT NULL DEFAULT '',
+  `notify_raw` mediumtext,
+  `paid_at` int(10) unsigned NOT NULL DEFAULT '0',
+  `created_at` int(10) unsigned NOT NULL DEFAULT '0',
+  `updated_at` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `out_trade_no` (`out_trade_no`),
+  KEY `uid` (`uid`),
+  KEY `product_id` (`product_id`),
+  KEY `pay_status` (`pay_status`),
+  KEY `created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `{dbprefix}shop_address` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0',
+  `buyer_name` varchar(64) NOT NULL DEFAULT '',
+  `buyer_phone` varchar(32) NOT NULL DEFAULT '',
+  `buyer_address` varchar(255) NOT NULL DEFAULT '',
+  `is_default` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` int(10) unsigned NOT NULL DEFAULT '0',
+  `updated_at` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `uid` (`uid`),
+  KEY `is_default` (`is_default`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `{dbprefix}shop_profile` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0',
+  `display_name` varchar(64) NOT NULL DEFAULT '',
+  `avatar` varchar(255) NOT NULL DEFAULT '',
+  `created_at` int(10) unsigned NOT NULL DEFAULT '0',
+  `updated_at` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uid` (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

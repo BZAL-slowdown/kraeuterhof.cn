@@ -1,0 +1,52 @@
+# Runtime/cache output
+/cache/log/*
+/cache/debuglog/*
+/cache/session/*
+/cache/temp/*
+/cache/template/*
+/cache/backups/*
+/cache/attach/*
+/cache/authcode/*
+/cache/cloud/*
+/cache/config/*
+/cache/data/*
+/cache/database/*
+/cache/debugbar/*
+/cache/file/*
+/cache/linkage/*
+/cache/module/*
+/cache/thread/*
+/runtime_php_server.*.log
+
+# Keep writable runtime directories present
+!/cache/log/.gitkeep
+!/cache/session/.gitkeep
+!/cache/temp/.gitkeep
+!/cache/template/.gitkeep
+
+# Payment certificates and private keys
+/cache/pay/**/*.pem
+/cache/pay/**/*.key
+/cache/pay/**/*.p12
+/cache/pay/**/*.crt
+!/cache/pay/alipay/.gitkeep
+!/cache/pay/wechat/.gitkeep
+
+# Local archives and database dumps
+*.zip
+*.tar
+*.tar.gz
+/*.sql
+/*.sql.gz
+/database*.sql
+/mysql*.sql
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Local-only secret overrides
+*.local.php
+.env
+.env.*

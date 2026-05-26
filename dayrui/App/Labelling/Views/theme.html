@@ -1,0 +1,522 @@
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6a82fb',
+            secondary: '#fc5c7d',
+            dark: '#2c3e50',
+            light: '#f8f9fa',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义样式 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-gradient {
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      }
+      .gradient-bg {
+        background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+      }
+      .gradient-bg-reverse {
+        background: linear-gradient(135deg, #fc5c7d 0%, #6a82fb 100%);
+      }
+      .blur-backdrop {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+    }
+  </style>
+
+<div class="bg-gray-50 font-sans text-dark">
+
+  <!-- 作品分类 -->
+  <section class="pt-20 pb-10 gradient-bg text-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">探索多样化的创意作品</h2>
+      </div>
+      
+      <div class="flex flex-wrap justify-center gap-4 mb-12" id="category-filter">
+        <button class="category-btn px-5 py-2 rounded-full font-semibold shadow-md transition-all bg-white text-primary" data-category="all">
+          全部作品
+        </button>
+        <button class="category-btn px-5 py-2 rounded-full font-medium shadow-md transition-all bg-white/20 text-white hover:bg-white/30" data-category="ai">
+          AI工具
+        </button>
+        <button class="category-btn px-5 py-2 rounded-full font-medium shadow-md transition-all bg-white/20 text-white hover:bg-white/30" data-category="cms">
+          CMS插件
+        </button>
+        <button class="category-btn px-5 py-2 rounded-full font-medium shadow-md transition-all bg-white/20 text-white hover:bg-white/30" data-category="seo">
+          SEO优化
+        </button>
+        <button class="category-btn px-5 py-2 rounded-full font-medium shadow-md transition-all bg-white/20 text-white hover:bg-white/30" data-category="multilang">
+          多语言
+        </button>
+      </div>
+
+      <div class="text-center mb-12">
+        <p class="text-white/80 max-w-2xl mx-auto">
+            <a target="_blank" href="https://qm.qq.com/q/tcRzPgUbBY" target="_blank">点击链接加入群聊【迅睿CMS交流群】</a>
+            
+        </p>
+        <p class="text-white/80 max-w-2xl mx-auto">
+            <a href="https://www.xunruicms.com/dever/2281.html" target="_blank">
+                开发者主页：https://www.xunruicms.com/dever/2281.html
+            </a>
+        </p>
+        
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 作品展示 -->
+  <section id="works" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8" id="works-grid">
+        <!-- 作品卡片将通过JavaScript动态生成 -->
+      </div>
+    </div>
+  </section>
+
+
+{code}
+  <!-- JavaScript -->
+  <script>
+    // 作品数据
+    const works = [
+      {
+        title: "AI文章生成器",
+        image: "https://file.xunruicms.com/thumb/fb/14/fe1bae53109cfed95c4a25beb1e0da4b/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1672.html",
+        category: "ai",
+        price: "￥99元",
+        description: "使用AI技术自动生成高质量文章，节省内容创作时间，提高工作效率。支持多种文章类型和风格，可根据需求自定义生成内容。"
+      },
+      {
+        title: "文件快速发布",
+        image: "https://file.xunruicms.com/thumb/28/1e/2e1eeb09329e7e660c28dd5ff08311e8/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1792.html",
+        category: "cms",
+        price: "￥39元",
+        description: "简化文件上传和发布流程，支持批量操作，提高工作效率。自动生成缩略图和文件预览，方便用户快速浏览内容。"
+      },
+      {
+        title: "火车头采集入库发布接口",
+        image: "https://file.xunruicms.com/thumb/85/f9/8dfbe1c109fb458f4a3a8b69bf847d95/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/579.html",
+        category: "cms",
+        price: "￥168元",
+        description: "与火车头采集器无缝集成，实现自动化内容采集、处理和发布。支持多种数据格式和存储方式，可根据需求自定义处理流程。"
+      },
+      {
+        title: "AIEditor",
+        image: "https://file.xunruicms.com/thumb/7d/72/71741bca0c944a872872c0d4efd2a82d/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1664.html",
+        category: "ai",
+        price: "￥59元",
+        description: "集成AI功能的编辑器，提供智能写作建议、语法检查和内容优化。支持多种格式导出，方便与其他系统集成。"
+      },
+      {
+        title: "数据重复筛查",
+        image: "https://file.xunruicms.com/thumb/26/25/2722110d9807b6afa8072e8d22ffaf56/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1152.html",
+        category: "cms",
+        price: "￥88元",
+        description: "高效识别和处理重复数据，提高数据质量和系统性能。支持多种数据类型和存储方式，可根据需求自定义筛查规则。"
+      },
+      {
+        title: "Querylist渐进式采集",
+        image: "https://file.xunruicms.com/thumb/40/42/424973f86408461d655ca98813700720/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1266.html",
+        category: "cms",
+        price: "￥199元",
+        description: "采用渐进式采集策略，降低服务器负载，提高采集效率。支持多种网站结构和反爬机制，可根据需求自定义采集规则。"
+      },
+      {
+        title: "schema结构化数据",
+        image: "https://file.xunruicms.com/thumb/ad/5c/a65d7f9b6c3bac2f4dedba11dbd714cd/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1770.html",
+        category: "seo",
+        price: "￥58元",
+        description: "自动生成和管理schema结构化数据，提高网站在搜索引擎中的展示效果。支持多种数据类型和格式，可根据需求自定义数据结构。"
+      },
+      {
+        title: "外贸多语言建站",
+        image: "https://file.xunruicms.com/thumb/c4/0c/c408152894d77a9dce3d5fda9b6399c4/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1323.html",
+        category: "multilang",
+        price: "￥220元",
+        description: "一站式多语言网站建设解决方案，支持自动翻译和本地化。提供多语言内容管理、URL结构优化和搜索引擎优化等功能。"
+      },
+      {
+        title: "知识库Ai客服",
+        image: "https://file.xunruicms.com/thumb/4c/19/4214d02476ef1b3c4457383dcb6add9c/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1784.html",
+        category: "ai",
+        price: "￥200元",
+        description: "集成AI技术的知识库和客服系统，提供智能问答和自动回复。支持多种语言和渠道，可根据需求自定义知识库结构和问答规则。"
+      },
+      {
+        title: "Txt文本批量发布",
+        image: "https://file.xunruicms.com/thumb/4c/f7/48f08cf1f8218aa3b11ad371494d017c/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1123.html",
+        category: "cms",
+        price: "￥99元",
+        description: "批量处理和发布txt文本文件，支持多种格式转换和内容处理。提供自动化工作流和定时任务，提高工作效率。"
+      },
+      {
+        title: "SEO文章配图优化",
+        image: "https://file.xunruicms.com/thumb/67/5f/6f5b37376322e7e1b2871c7f40b182f7/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/800.html",
+        category: "seo",
+        price: "￥99元",
+        description: "自动优化文章配图，提高图片质量和搜索引擎可见性。支持图片压缩、格式转换和ALT标签优化等功能。"
+      },
+      {
+        title: "SEO蜘蛛301跳转(改写路径)",
+        image: "https://file.xunruicms.com/thumb/c2/21/ca2c5be3f070cbad8bbedaec9e4f5312/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/945.html",
+        category: "seo",
+        price: "￥99元",
+        description: "智能处理301跳转，优化网站URL结构，提高搜索引擎友好性。支持批量操作和规则自定义，方便网站改版和结构调整。"
+      },
+      {
+        title: "谷歌主动推送Google",
+        image: "https://file.xunruicms.com/thumb/7b/84/7b8fac333fe4ec9b044a8a64829a9e4b/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1522.html",
+        category: "seo",
+        price: "￥99元",
+        description: "自动向谷歌搜索引擎推送新内容，加快索引速度，提高网站可见性。支持定时推送和事件触发推送，可根据需求自定义推送规则。"
+      },
+      {
+        title: "附件主题窗口",
+        image: "https://file.xunruicms.com/thumb/d5/57/d0536786bcc35ecb3585bd0d70e24c75/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1312.html",
+        category: "cms",
+        price: "￥38元",
+        description: "优化附件管理和展示体验，提供主题化窗口和预览功能。支持多种文件类型和预览方式，可根据需求自定义主题和展示效果。"
+      },
+      {
+        title: "后台主题管理",
+        image: "https://file.xunruicms.com/thumb/94/bf/96ba352138a42564c3127af424b9d7f4/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1767.html",
+        category: "cms",
+        price: "￥99元",
+        description: "提供丰富的后台管理界面主题，支持一键切换和自定义。优化界面设计和用户体验，提高工作效率和管理舒适度。"
+      },
+      {
+        title: "Excel模块导入",
+        image: "https://file.xunruicms.com/thumb/9d/f9/9bfbdd7b45ef96fe3fed42e6909c219d/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1022.html",
+        category: "cms",
+        price: "￥298元",
+        description: "高效导入Excel数据到系统中，支持数据映射和验证。提供批量处理和错误日志，确保数据准确性和完整性。"
+      },
+      {
+        title: "百度AI批量检测敏感词",
+        image: "https://file.xunruicms.com/thumb/dd/c7/d0ca8a9ac2f87b25142fa95fbd1abe7d/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1510.html",
+        category: "ai",
+        price: "￥199元",
+        description: "利用百度AI技术批量检测和过滤敏感词，提高内容安全性。支持多种语言和自定义敏感词库，可根据需求自定义检测规则和处理方式。"
+      },
+      {
+        title: "AI配图-阿里通义万相",
+        image: "https://file.xunruicms.com/thumb/4b/92/41991f9319fdb7a61308da780946f92b/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1544.html",
+        category: "ai",
+        price: "￥58元",
+        description: "基于阿里通义万相AI模型，自动为文章和内容生成高质量配图。支持多种风格和主题，可根据需求自定义生成参数和筛选条件。"
+      },
+      {
+        title: "翻译语言包生成工具",
+        image: "https://file.xunruicms.com/thumb/e2/29/e02d4f83de62604eefb7bf7591c40492/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1630.html",
+        category: "multilang",
+        price: "￥99元",
+        description: "自动生成和管理多语言网站的翻译语言包，支持批量翻译和更新。提供翻译记忆和术语库功能，提高翻译效率和一致性。"
+      },
+      {
+        title: "SEO模板压缩伪原创",
+        image: "https://file.xunruicms.com/thumb/96/d7/9cd8cd1fbbf4f892f107fc3bc9cce476/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1319.html",
+        category: "seo",
+        price: "￥99元",
+        description: "智能压缩和优化SEO模板，提高网站加载速度和搜索引擎友好性。支持伪原创内容生成，降低内容重复率，提高网站质量。"
+      },
+      {
+        title: "rss订阅 rss feed",
+        image: "https://file.xunruicms.com/thumb/8b/ce/85c15c199c35a3e3f00299735dfbd2eb/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1435.html",
+        category: "cms",
+        price: "￥20元",
+        description: "提供RSS订阅和发布功能，方便用户获取网站最新内容。支持多种格式和订阅方式，可根据需求自定义订阅规则和展示效果。"
+      },
+      {
+        title: "专题SEO分站",
+        image: "https://file.xunruicms.com/thumb/ac/bd/aab8ffc3532635427dbfa764080b94dc/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/957.html",
+        category: "seo",
+        price: "￥300元",
+        description: "为特定主题和关键词创建独立的SEO优化分站，提高针对性和排名效果。支持内容聚合和分发，可根据需求自定义网站结构和优化策略。"
+      },
+      {
+        title: "友链交换TDK",
+        image: "https://file.xunruicms.com/thumb/82/c4/87c8812aeeb170aa52177d2735ca7042/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/873.html",
+        category: "seo",
+        price: "￥20元",
+        description: "自动管理和优化友情链接，提供TDK设置和分析功能。支持批量操作和链接质量检测，提高网站链接权重和排名效果。"
+      },
+      {
+        title: "快速批量录入",
+        image: "https://file.xunruicms.com/thumb/27/ee/20e4c199f338e9496b23be7c1df213e7/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1083.html",
+        category: "cms",
+        price: "￥59元",
+        description: "高效批量录入数据，支持多种格式和来源。提供模板导入和自动填充功能，提高数据录入效率和准确性。"
+      },
+      {
+        title: "关注公众号阅读更多",
+        image: "https://file.xunruicms.com/thumb/a7/09/ae0e61a84d697474e48f631ccb0cfc97/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1049.html",
+        category: "cms",
+        price: "￥99元",
+        description: "引导用户关注公众号以获取更多内容，增加用户粘性和转化率。支持多种展示方式和互动效果，可根据需求自定义引导策略和奖励机制。"
+      },
+      {
+        title: "定时发布-草稿箱",
+        image: "https://file.xunruicms.com/thumb/e9/25/e023c06084b256848e193122dbce4e59/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1015.html",
+        category: "cms",
+        price: "￥300元",
+        description: "提供定时发布和草稿管理功能，优化内容发布计划和流程。支持多平台同步和发布历史记录，方便内容管理和优化。"
+      },
+      {
+        title: "个人收款-支付宝[免营业执照]",
+        image: "https://file.xunruicms.com/thumb/a2/88/ab8867645b0ef41d278102c85b55f782/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/544.html",
+        category: "cms",
+        price: "￥168元",
+        description: "提供个人支付宝收款功能，无需营业执照即可开通。支持多种支付方式和订单管理，可根据需求自定义收款页面和流程。"
+      },
+      {
+        title: "IndexNow搜索引擎提交",
+        image: "https://file.xunruicms.com/thumb/fd/a8/ffa06554332663305d00b9882828068d/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1718.html",
+        category: "seo",
+        price: "￥50元",
+        description: "自动向支持IndexNow协议的搜索引擎提交新内容，加快索引速度。支持多种提交方式和定时任务，可根据需求自定义提交规则和频率。"
+      },
+      {
+        title: "模块表单支付",
+        image: "https://file.xunruicms.com/thumb/52/54/585658b667a23474f968d1df30fdbc42/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1709.html",
+        category: "cms",
+        price: "￥99元",
+        description: "为网站模块表单添加支付功能，支持多种支付方式和支付流程。提供订单管理和支付回调功能，可根据需求自定义支付页面和规则。"
+      },
+      {
+        title: "证书生成器拖拽生成",
+        image: "https://file.xunruicms.com/thumb/d9/cb/d3c19f94623b69b93e421a4ca2d4e2b9/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1701.html",
+        category: "cms",
+        price: "￥99元",
+        description: "提供拖拽式证书生成功能，支持自定义证书模板和内容。支持多种证书类型和导出格式，可根据需求自定义证书样式和生成规则。"
+      },
+      {
+        title: "关键词配图找图",
+        image: "https://file.xunruicms.com/thumb/e2/f7/edf4f8280172ea664ef938bf3e540172/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1686.html",
+        category: "cms",
+        price: "￥50元",
+        description: "根据关键词自动搜索和匹配相关图片，提高内容配图效率和质量。支持多种图片来源和筛选条件，可根据需求自定义搜索规则和图片处理方式。"
+      },
+      {
+        title: "素材作品批量发布",
+        image: "https://file.xunruicms.com/thumb/71/4a/7048f11cb2186be2c0f9adf9a4fdf9a1/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1461.html",
+        category: "cms",
+        price: "￥88元",
+        description: "批量处理和发布素材作品，支持多种格式和平台。提供自动化工作流和定时任务，提高内容发布效率和一致性。"
+      },
+      {
+        title: "小黄人工具箱",
+        image: "https://file.xunruicms.com/thumb/83/fd/81fdb57a3bf9f31ff96243ea36d021d3/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1660.html",
+        category: "cms",
+        price: "免费",
+        description: "集成多种实用工具的工具箱，提供文本处理、图片优化、代码格式化等功能。完全免费使用，无需注册和登录，方便快捷。"
+      },
+      {
+        title: "问答组合一键采集",
+        image: "https://file.xunruicms.com/thumb/35/4a/3b405123e84a43121f020480ee725da5/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1163.html",
+        category: "cms",
+        price: "￥999元",
+        description: "一键采集和整理问答组合内容，支持多种问答平台和格式。提供智能分类和标签功能，提高内容整理效率和质量。"
+      },
+      {
+        title: "联动数据入库",
+        image: "https://file.xunruicms.com/thumb/b3/0b/b20325f84d113d286453dc13196517b3/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1675.html",
+        category: "cms",
+        price: "￥59元",
+        description: "实现多系统数据联动和同步，支持实时和定时同步。提供数据映射和转换功能，确保数据一致性和完整性。"
+      },
+      {
+        title: "内容资料整理",
+        image: "https://file.xunruicms.com/thumb/f6/4c/fa4181f0908262b9a921cbf04f821dc6/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/585.html",
+        category: "cms",
+        price: "￥8元",
+        description: "高效整理和管理内容资料，支持多种格式和分类方式。提供搜索和筛选功能，方便快速查找和使用所需资料。"
+      },
+      {
+        title: "后台二次登陆验证",
+        image: "https://file.xunruicms.com/thumb/01/8b/0282dd8ad8db65298eb5919794562ab1/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1449.html",
+        category: "cms",
+        price: "￥18元",
+        description: "为后台管理系统添加二次登录验证功能，提高账户安全性。支持多种验证方式和自定义规则，可根据需求设置验证频率和范围。"
+      },
+      {
+        title: "内容足迹",
+        image: "https://file.xunruicms.com/thumb/df/36/db3055a9a2adc7ac8f63c2cafeffa86f/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/512.html",
+        category: "cms",
+        price: "￥58元",
+        description: "记录用户浏览和互动行为，形成内容足迹。提供个性化推荐和内容过滤功能，提高用户体验和内容相关性。"
+      },
+      {
+        title: "违禁词（同义词替换）",
+        image: "https://file.xunruicms.com/thumb/03/1a/021aa8517f0c7c05ce41da6a787ab6a3/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/1217.html",
+        category: "cms",
+        price: "￥38元",
+        description: "自动检测和替换文本中的违禁词，支持同义词替换和自定义词库。提供批量处理和实时检测功能，确保内容合规性和安全性。"
+      },
+      {
+        title: "JS广告投放管理",
+        image: "https://file.xunruicms.com/thumb/a2/ac/a3a0bac12700672bc9488d80c7d7adc2/120x120_auto.webp",
+        url: "https://www.xunruicms.com/shop/908.html",
+        category: "cms",
+        price: "￥68元",
+        description: "全面管理网站JS广告投放，提供精准定位和数据分析功能。支持多种广告格式和投放策略，可根据需求自定义广告展示规则和效果分析指标。"
+      }
+    ];
+
+    // 初始化页面
+    document.addEventListener('DOMContentLoaded', function() {
+      // 初始渲染所有作品
+      renderWorks(works);
+      
+      // 分类筛选功能
+      const categoryBtns = document.querySelectorAll('.category-btn');
+      
+      categoryBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          // 更新按钮样式
+          categoryBtns.forEach(b => {
+            b.classList.remove('bg-white', 'text-primary', 'font-semibold');
+            b.classList.add('bg-white/20', 'text-white', 'font-medium', 'hover:bg-white/30');
+          });
+          this.classList.remove('bg-white/20', 'text-white', 'font-medium', 'hover:bg-white/30');
+          this.classList.add('bg-white', 'text-primary', 'font-semibold');
+          
+          // 根据分类筛选并渲染作品
+          const category = this.getAttribute('data-category');
+          filterWorks(category);
+        });
+      });
+    });
+    
+    // 渲染作品卡片
+    function renderWorks(worksArray) {
+      const worksGrid = document.getElementById('works-grid');
+      worksGrid.innerHTML = '';
+      
+      worksArray.forEach(work => {
+        const card = document.createElement('div');
+        card.className = 'group card-hover bg-white rounded-xl overflow-hidden shadow-md';
+        card.setAttribute('data-category', work.category);
+        
+        card.innerHTML = `
+          <a href="${work.url}" target="_blank" class="block cursor-pointer">
+            <div class="h-40 relative flex items-center justify-center p-4 overflow-hidden" style="background-image: url('${work.image}'); background-size: cover; background-position: center;">
+              <div class="absolute inset-0 bg-black/10 backdrop-blur-3xl"></div>
+              <img src="${work.image}" alt="${work.title}" class="relative max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-110 rounded-xl">
+            </div>
+            <div class="p-4 flex flex-col justify-between" style="height: 140px;">
+              <div>
+                <h3 class="text-lg font-semibold mb-1 text-dark truncate" title="${work.title}">${work.title}</h3>
+                <p class="text-gray-500 text-sm mb-3 h-10 line-clamp-2">${work.description}</p>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <!--span class="text-primary font-bold text-lg">${work.price}</span-->
+                <span class="text-xs px-2 py-1 bg-primary/10 text-primary font-medium rounded-full">${getCategoryName(work.category)}</span>
+              </div>
+            </div>
+          </a>
+        `;
+        
+        worksGrid.appendChild(card);
+      });
+    }
+    
+    // 筛选作品
+    function filterWorks(category) {
+      let filteredWorks;
+      
+      if (category === 'all') {
+        filteredWorks = works;
+      } else {
+        filteredWorks = works.filter(work => work.category === category);
+      }
+      
+      renderWorks(filteredWorks);
+    }
+    
+    // 获取分类名称
+    function getCategoryName(category) {
+      const categoryMap = {
+        'ai': 'AI工具',
+        'cms': 'CMS插件',
+        'seo': 'SEO优化',
+        'multilang': '多语言'
+      };
+      
+      return categoryMap[category] || category;
+    }
+  </script>
+{/code}
+
+</div>
+{template "footer.html"}

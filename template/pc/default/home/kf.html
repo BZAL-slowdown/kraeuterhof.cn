@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php $kefu=dr_site_value('aikehu');?>
+    <?php if ($kefu) { $key=0; foreach ($kefu as $v) { ?>
+    <title>{$v[2]}</title>
+    <?php  $key++; } } ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a2a6c;
+            --secondary-color: #2a4d8e;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --text-color: #333;
+            --border-color: #eaeaea;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .deepseek-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+        }
+        
+        .deepseek-header {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 0;
+            flex-shrink: 0;
+        }
+        
+        .deepseek-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .deepseek-logo i {
+            font-size: 28px;
+        }
+        
+        .deepseek-logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .deepseek-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .deepseek-main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            min-height: 0; /* 关键修复：允许内容收缩 */
+        }
+        
+        .deepseek-chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            min-height: 0; /* 关键修复：允许内容收缩 */
+        }
+        
+        .deepseek-chat-header {
+            padding: 15px 20px;
+            background-color: var(--light-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0; /* 防止头部被压缩 */
+        }
+        
+        .deepseek-chat-header h2 {
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+        
+        .deepseek-chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 0; /* 关键修复：允许内容收缩 */
+            -webkit-overflow-scrolling: touch; /* 移动端平滑滚动 */
+        }
+        
+        .deepseek-message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 18px;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+            flex-shrink: 0; /* 防止消息被压缩 */
+            word-wrap: break-word; /* 移动端文本换行 */
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .deepseek-user-message {
+            align-self: flex-end;
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .deepseek-ai-message {
+            align-self: flex-start;
+            background-color: #f1f5f9;
+            color: #334155;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .deepseek-message-time {
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0.7;
+            text-align: right;
+        }
+        
+        .deepseek-typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background-color: #f1f5f9;
+            padding: 15px;
+            border-radius: 18px;
+            border-bottom-left-radius: 5px;
+            flex-shrink: 0;
+        }
+        
+        .deepseek-typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .deepseek-typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #64748b;
+            border-radius: 50%;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .deepseek-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .deepseek-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typingAnimation {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        
+        .deepseek-chat-input {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0; /* 防止输入框被压缩 */
+        }
+        
+        .deepseek-chat-input input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 1px solid #d1d5db;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .deepseek-chat-input input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+        }
+        
+        .deepseek-chat-input button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .deepseek-chat-input button:hover:not(:disabled) {
+            background-color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+        
+        .deepseek-chat-input button:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+        
+        .deepseek-sidebar {
+            width: 350px;
+            background-color: var(--light-bg);
+            padding: 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        
+        .deepseek-section-title {
+            font-size: 18px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .deepseek-faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .deepseek-faq-item {
+            padding: 15px;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .deepseek-faq-item:hover {
+            background-color: #eef2ff;
+            transform: translateY(-2px);
+        }
+        
+        .deepseek-knowledge-base {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .deepseek-knowledge-search {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .deepseek-knowledge-search input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .deepseek-knowledge-search button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .deepseek-knowledge-search button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .deepseek-knowledge-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .deepseek-knowledge-category {
+            background-color: #eef2ff;
+            color: var(--primary-color);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .deepseek-knowledge-category:hover,
+        .deepseek-knowledge-category.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .deepseek-knowledge-items {
+            max-height: 200px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* 移动端平滑滚动 */
+        }
+        
+        .deepseek-knowledge-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .deepseek-knowledge-item:hover {
+            color: var(--primary-color);
+        }
+        
+        .deepseek-knowledge-item:last-child {
+            border-bottom: none;
+        }
+        
+        .deepseek-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .deepseek-feature {
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .deepseek-feature:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .deepseek-feature i {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .deepseek-feature p {
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        .deepseek-contact-info {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .deepseek-contact-info p {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        .deepseek-contact-info i {
+            color: var(--primary-color);
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        .deepseek-footer {
+            padding: 15px 30px;
+            background-color: #f1f5f9;
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        
+        /* 滚动条样式优化 */
+        .deepseek-chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .deepseek-chat-messages::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        
+        .deepseek-chat-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        .deepseek-chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* 移动端触摸优化 */
+        .deepseek-chat-messages {
+            -webkit-overflow-scrolling: touch;
+            overflow-scrolling: touch;
+        }
+
+        /* 防止移动端点击延迟 */
+        .deepseek-faq-item,
+        .deepseek-knowledge-item,
+        .deepseek-knowledge-category,
+        .deepseek-chat-input button {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .deepseek-container {
+                height: 95vh;
+                border-radius: 15px;
+            }
+            
+            .deepseek-main {
+                flex-direction: column;
+            }
+            
+            .deepseek-sidebar {
+                width: 100%;
+                order: -1;
+                max-height: 300px;
+                padding: 15px;
+            }
+            
+            .deepseek-chat-container {
+                border-right: none;
+            }
+            
+            .deepseek-message {
+                max-width: 90%;
+                padding: 12px;
+            }
+            
+            .deepseek-chat-messages {
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            .deepseek-chat-input {
+                padding: 15px;
+            }
+            
+            .deepseek-chat-input input {
+                padding: 12px 18px;
+                font-size: 16px; /* 防止iOS缩放 */
+            }
+            
+            .deepseek-header {
+                padding: 15px 20px;
+            }
+            
+            .deepseek-logo h1 {
+                font-size: 20px;
+            }
+            
+            .deepseek-status {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            
+            /* 移动端滚动优化 */
+            .deepseek-chat-messages {
+                -webkit-overflow-scrolling: touch;
+                overflow-y: scroll;
+                height: 100%;
+            }
+        }
+
+        /* 超小屏幕优化 */
+        @media (max-width: 480px) {
+            .deepseek-logo h1 {
+                font-size: 18px;
+            }
+            
+            .deepseek-message {
+                max-width: 95%;
+                padding: 10px;
+            }
+            
+            .deepseek-chat-messages {
+                padding: 10px;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="deepseek-container">
+        <div class="deepseek-header">
+            <div class="deepseek-logo">
+                <?php if ($kefu) { $key=0; foreach ($kefu as $v) { ?>
+
+                <img src="{dr_get_file($v[1])}" width="80px" height="100px">
+                <h1>{$v[2]}</h1>
+                <?php  $key++; } } ?>
+            </div>
+            <div class="deepseek-status">
+                <div class="status-dot"></div>
+                <span>在线服务中</span>
+            </div>
+        </div>
+        
+        <div class="deepseek-main">
+            <div class="deepseek-chat-container">
+                
+                <div class="deepseek-chat-messages" id="deepseekChatMessages">
+                    <div class="deepseek-message deepseek-ai-message">
+                        <?php $mysite=dr_site_value('aikehudiyiju');?>
+                        <div>{$mysite}</div>
+                        <div class="deepseek-message-time" id="deepseekInitialTime">刚刚</div>
+                    </div>
+                </div>
+                
+                <div class="deepseek-typing-indicator" id="deepseekTypingIndicator">
+                    <div class="deepseek-typing-dots">
+                        <div class="deepseek-typing-dot"></div>
+                        <div class="deepseek-typing-dot"></div>
+                        <div class="deepseek-typing-dot"></div>
+                    </div>
+                </div>
+                
+                <div class="deepseek-chat-input">
+                    <input type="text" id="deepseekMessageInput" placeholder="输入您的问题..." autocomplete="off">
+                    <button id="deepseekSendButton">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 配置API密钥和端点
+        const DEEPSEEK_API_KEY = 'sk-98432ab420b64a28a24fd026f9cfffaa';
+        const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+        
+        // 知识库数据
+        const knowledgeBase = {
+            <?php $zsk=dr_site_value('aizhishiku');?>
+            {php $mval = $zsk;}
+{loop $mval $v}
+"{$v[1]}": "{$v[2]}",
+{/loop}
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('deepseekChatMessages');
+            const messageInput = document.getElementById('deepseekMessageInput');
+            const sendButton = document.getElementById('deepseekSendButton');
+            const typingIndicator = document.getElementById('deepseekTypingIndicator');
+            
+            // 设置初始时间
+            document.getElementById('deepseekInitialTime').textContent = getCurrentTime();
+            
+            // 添加消息到聊天窗口
+            function addMessage(message, isUser) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `deepseek-message ${isUser ? 'deepseek-user-message' : 'deepseek-ai-message'}`;
+                
+                const messageContent = document.createElement('div');
+                // 处理换行和代码块
+                message = message.replace(/\n/g, '<br>');
+                message = message.replace(/```([^`]+)```/g, '<pre><code>$1</code></pre>');
+                messageContent.innerHTML = message;
+                messageDiv.appendChild(messageContent);
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'deepseek-message-time';
+                timeDiv.textContent = getCurrentTime();
+                messageDiv.appendChild(timeDiv);
+                
+                chatMessages.appendChild(messageDiv);
+                
+                // 只有在添加新消息时才自动滚动到底部
+                // 如果用户正在查看历史消息，不要强制滚动
+                const isAtBottom = isScrollAtBottom();
+                if (isAtBottom) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }
+            
+            // 检查是否在滚动条底部
+            function isScrollAtBottom() {
+                const threshold = 100; // 距离底部的阈值
+                return chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight <= threshold;
+            }
+            
+            // 获取当前时间
+            function getCurrentTime() {
+                const now = new Date();
+                return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            }
+            
+            // 显示/隐藏打字指示器
+            function showTypingIndicator() {
+                typingIndicator.style.display = 'block';
+                // 显示打字指示器时强制滚动到底部
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function hideTypingIndicator() {
+                typingIndicator.style.display = 'none';
+            }
+            
+            // 调用DeepSeek API
+            async function callDeepSeekAPI(userMessage) {
+                try {
+                    showTypingIndicator();
+                    
+                    // 检查知识库中是否有匹配的问题
+                    const knowledgeAnswer = searchKnowledgeBase(userMessage);
+                    if (knowledgeAnswer) {
+                        // 模拟API响应时间
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        return knowledgeAnswer;
+                    }
+                    
+                    // 如果没有找到知识库答案，调用真实API
+                    const response = await fetch(DEEPSEEK_API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer sk-98432ab420b64a28a24fd026f9cfffaa`
+                        },
+                        body: JSON.stringify({
+                            model: "deepseek-chat",
+                            messages: [
+                                {
+                                    role: "system",
+                                    content: "你是一个专业的AI客服助手，专门回答关于DeepSeek AI服务的问题。请提供准确、有帮助的回答。"
+                                },
+                                {
+                                    role: "user",
+                                    content: userMessage
+                                }
+                            ],
+                            max_tokens: 1000,
+                            temperature: 0.7
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API请求失败: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    return data.choices[0].message.content;
+                    
+                } catch (error) {
+                    console.error('API调用错误:', error);
+                    // 如果API调用失败，返回模拟响应
+                    return getFallbackResponse(userMessage);
+                } finally {
+                    hideTypingIndicator();
+                }
+            }
+            
+            // 搜索知识库
+            function searchKnowledgeBase(query) {
+                const lowerQuery = query.toLowerCase();
+                
+                // 精确匹配
+                for (const [question, answer] of Object.entries(knowledgeBase)) {
+                    if (lowerQuery.includes(question.toLowerCase()) || 
+                        question.toLowerCase().includes(lowerQuery)) {
+                        return answer;
+                    }
+                }
+                
+                // 关键词匹配
+                const keywords = {
+                    '功能': 'DeepSeek的主要功能有哪些？',
+                    '开始使用': '如何开始使用DeepSeek？',
+                    '技术问题': '常见的技术问题解决方案',
+                    '系统要求': '系统要求和兼容性',
+                    '定价': '定价和计费方式',
+                    '升级': '如何升级账户？',
+                    'api': 'API调用示例',
+                    '错误': 'API错误代码说明'
+                };
+                
+                for (const [keyword, question] of Object.entries(keywords)) {
+                    if (lowerQuery.includes(keyword)) {
+                        return knowledgeBase[question];
+                    }
+                }
+                
+                return null;
+            }
+            
+            // 备用响应（当API不可用时）
+            function getFallbackResponse(userMessage) {
+                const responses = {
+                    "deepseek是什么": "DeepSeek是一家专注于人工智能技术研发的公司，提供先进的AI模型和解决方案。我们的主要产品包括DeepSeek Chat（对话AI）、DeepSeek Coder（代码生成）等，帮助开发者和企业构建智能应用。",
+                    "如何使用deepseek api": "要使用DeepSeek API，您需要：1) 注册DeepSeek账户 2) 在控制台获取API密钥 3) 按照官方文档集成API。我们提供RESTful API接口和多种编程语言的SDK，支持文本生成、代码补全、对话系统等功能。",
+                    "deepseek支持哪些编程语言": "DeepSeek API支持多种编程语言调用，包括Python、JavaScript、Java、Go、C#等。我们还提供了详细的文档和代码示例，帮助您快速集成到现有项目中。",
+                    "deepseek的定价": "DeepSeek提供灵活的定价方案：1) 免费层：每月有一定免费调用额度 2) 按量付费：根据实际使用量计费 3) 企业版：定制化服务。具体价格请参考官网最新定价页面。",
+                    "如何获取技术支持": "您可以通过以下方式获取技术支持：1) 查看官方文档 2) 发送邮件至support@deepseek.com 3) 加入开发者社区 4) 提交工单。我们的技术支持团队会在24小时内响应您的问题。"
+                };
+                
+                const lowerMessage = userMessage.toLowerCase();
+                for (const key in responses) {
+                    if (lowerMessage.includes(key)) {
+                        return responses[key];
+                    }
+                }
+                
+                // 默认回复
+                const defaultResponses = [
+                    "感谢您的提问！作为DeepSeek AI助手，我很乐意为您解答。如果您需要更详细的技术信息，建议查阅我们的官方文档。",
+                    "这是一个很好的问题！DeepSeek在这方面有很多功能和应用场景，您可以具体描述一下您的需求吗？",
+                    "我理解您的问题。为了给您最准确的回答，您能提供更多细节或具体的使用场景吗？",
+                    "关于这个问题，我们的官方文档中有详细的说明和示例代码。您也可以直接联系我们的技术支持团队获取个性化帮助。"
+                ];
+                
+                return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+            }
+            
+            // 发送消息
+            async function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message === '') return;
+                
+                // 禁用输入和按钮
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+                
+                addMessage(message, true);
+                messageInput.value = '';
+                
+                try {
+                    const response = await callDeepSeekAPI(message);
+                    addMessage(response, false);
+                } catch (error) {
+                    addMessage("抱歉，暂时无法连接到AI服务。请检查您的网络连接或稍后重试。", false);
+                } finally {
+                    // 重新启用输入和按钮
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    messageInput.focus();
+                }
+            }
+            
+            // 事件监听
+            sendButton.addEventListener('click', sendMessage);
+            
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // 页面加载后自动聚焦输入框
+            messageInput.focus();
+
+            // 移动端触摸事件支持
+            document.addEventListener('touchstart', function() {}, { passive: true });
+        });
+    </script>
+</body>
+</html>

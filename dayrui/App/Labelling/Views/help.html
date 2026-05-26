@@ -1,0 +1,225 @@
+{template "header.html"}
+
+<style>
+.labmr10{ margin-right: 10px; }
+.labtxt{color: #999;}
+.dis{ display: none }
+.custom-header{ height: 30px; line-height: 30px; background: #2f353b; color: #fff; text-align: center; border-radius: 3px; margin-bottom: 3px;}
+.ms-container .ms-list{ /*border-top: 0px!important;  margin-top: -1px;*/}
+</style>
+
+
+<div class="portlet light bordered">
+    <div class="portlet-title">
+        <div class="caption">
+            <span class="caption-subject font-green-sharp">
+                官方手册部分常用
+            </span>
+            <span class="caption-helper">
+                重新归类，查找更方便
+            </span>
+        </div>
+    </div>
+    <div class="portlet-body form form-horizontal">
+            <div class="form-body">
+
+
+<?php $comm = array(
+    '392'=>'当前使用的模板',
+    '465'=>'固定变量',
+    '627'=>'关键JS类',
+    '831'=>'循环优化',
+);?>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label">全局</label>
+                    <div class="col-md-9">
+                    <?php
+                    foreach($comm as $key => $value)
+                      {
+                      echo PHP_EOL.'<label><a href="javascript:dr_help_labe('.$key.');" class="btn blue">'.$value.'</a></label>';
+
+                      }
+                    ?>
+                    </div>
+                </div>
+
+<?php $list = array(
+    '389'=>'共享栏目菜单',
+    '388'=>'独立栏目菜单',
+    '623'=>'单独调用栏目',
+    '790'=>'相关栏目',
+    '534'=>'瀑布流',
+    '426'=>'任意表循环',
+);?>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">栏目</label>
+                    <div class="col-md-9">
+                    <?php
+                    foreach($list as $key => $value)
+                      {
+                      echo PHP_EOL.'<label><a href="javascript:dr_help_labe('.$key.');" class="btn blue">'.$value.'</a></label>';
+
+                      }
+                    ?>
+                    </div>
+                </div>
+
+<?php $user = array(
+    '367'=>'是否登录',
+    '455'=>'用户组调用',
+    '428'=>'用户列表',
+);?>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">用户</label>
+                    <div class="col-md-9">
+                    <?php
+                    foreach($user as $key => $value)
+                      {
+                      echo PHP_EOL.'<label><a href="javascript:dr_help_labe('.$key.');" class="btn blue">'.$value.'</a></label>';
+
+                      }
+                    ?>
+                    </div>
+                </div>
+
+
+<?php $sousuo = array(
+    '746'=>'搜索框',
+    '753'=>'搜索函数组成',
+    '714'=>'多条件/复选',
+    '740'=>'时间范围',
+    '759'=>'联动条件写法',
+);?>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">搜索</label>
+                    <div class="col-md-9">
+                    <?php
+                    foreach($sousuo as $key => $value)
+                      {
+                      echo PHP_EOL.'<label><a href="javascript:dr_help_labe('.$key.');" class="btn blue">'.$value.'</a></label>';
+
+                      }
+                    ?>
+                        
+                    </div>
+                </div>
+
+<?php $zidingyi = array(
+    '684'=>'用户设定值Score',
+    '685'=>'百度地图Baidumap',
+    '686'=>'复选框 Checkbox',
+    '687'=>'颜色选取Color',
+    '688'=>'时间字段 Date',
+    '689'=>'单文件File',
+    '690'=>'多文件Files',
+    '691'=>'表格字段 Ftable',
+    '692'=>'图片专用Image',
+    '693'=>'联动菜单（单选） Linkage',
+    '694'=>'价格字段 Pay',
+    '695'=>'参数属性Property',
+    '696'=>'单选字段Radio',
+    '697'=>'模块内容关联 Related',
+    '698'=>'下拉选择 Select',
+    '699'=>'文本 Text',
+    '700'=>'多行文本Textarea',
+    '701'=>'编辑器 Ueditor',
+    '702'=>'联动菜单（多选）Linkages',
+    '703'=>'副栏目 Catids',
+    '709'=>'用户关联 Members',
+    '755'=>'自定义字段控件输',
+);?>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">自定义字段</label>
+                    <div class="col-md-9">
+                    <?php
+                    foreach($zidingyi as $key => $value)
+                      {
+                      echo PHP_EOL.'<label><a href="javascript:dr_help_labe('.$key.');" class="btn grey">'.$value.'</a></label>';
+
+                      }
+                    ?>
+                        
+                    </div>
+                </div>
+
+
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label">搜索</label>
+                    <div class="col-md-9">
+<?php $sousuo = array(
+
+    '746'=>'搜索框',
+    '753'=>'搜索函数组成',
+    '714'=>'多条件/复选',
+    '740'=>'时间范围',
+    '759'=>'联动条件写法',
+
+);
+foreach($sousuo as $key => $value)
+  {
+  echo PHP_EOL.'<label><a href="javascript:dr_help_labe('.$key.');" class="btn blue">'.$value.'</a></label>';
+
+  }
+?>
+                        
+                    </div>
+                </div>
+
+
+
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label">表单</label>
+                    <div class="col-md-9">
+<?php $sousuo = array(
+
+    '56'=>'循环-网站表单form',
+    '427'=>'循环-模块表单mform',
+    '612'=>'调用-任意页面form表单',
+    '6'=>'模板-网站表单',
+    '100'=>'模板-模块表单',
+
+);
+foreach($sousuo as $key => $value)
+  {
+  echo PHP_EOL.'<label><a href="javascript:dr_help_labe('.$key.');" class="btn dark">'.$value.'</a></label>';
+
+  }
+?>
+                        
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+            </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    function dr_help_labe(id) {
+        if (is_oemcms == 1) {
+            dr_tips(1, '请联系开发商');
+            return;
+        }
+        layer.open({
+            type: 2,
+            title: '<i class="fa fa-question-circle"></i> 在线帮助',
+            shadeClose: true,
+            scrollbar: false,
+            shade: 0,
+            area: ['80%', '90%'],
+            content: 'https://www.xunruicms.com/index.php?s=doc&c=show&id='+id+'&is_phpcmf=cms'
+        });
+    }
+</script>
+
+{template "footer.html"}

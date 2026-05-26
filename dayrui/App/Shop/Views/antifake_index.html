@@ -1,0 +1,103 @@
+{template "header.html"}
+<div class="page-content">
+  <div class="portlet light bordered">
+    <div class="portlet-title">
+      <div class="caption"><i class="fa fa-shield"></i> 防伪码批量导入</div>
+    </div>
+    <div class="portlet-body">
+      <div class="margin-bottom-20">
+        <a href="{dr_url('shop/order/index')}" class="btn default"><i class="fa fa-list"></i> 订单管理</a>
+        <a href="{dr_url('shop/profile/index')}" class="btn default"><i class="fa fa-user"></i> 会员资料</a>
+        <a href="{dr_url('shop/payconfig/index')}" class="btn default"><i class="fa fa-credit-card"></i> 支付配置</a>
+        <a href="{dr_url('shop/antifake/index')}" class="btn green"><i class="fa fa-shield"></i> 防伪码导入</a>
+      </div>
+
+      {if $result}
+      <div class="alert {if $result.code}alert-success{else}alert-danger{/if}">
+        <p><strong>{$result.msg}</strong></p>
+        {if $result.data}
+        <p>
+          读取行数：{$result.data.read_rows}，
+          新增：{$result.data.created}，
+          重复跳过：{$result.data.duplicated}，
+          无效跳过：{$result.data.invalid}
+        </p>
+        {if $result.data.errors}
+        <ul style="margin-bottom:0">
+          {loop $result.data.errors $e}
+          <li>{$e}</li>
+          {/loop}
+        </ul>
+        {/if}
+        {/if}
+      </div>
+      {/if}
+
+      <div class="alert alert-info">
+        本功能会把防伪码写入原来的「防伪辨识管理」栏目，前台防伪查询会同步生效。Excel 文件请先另存为 CSV 后上传。
+      </div>
+
+      <form class="form-horizontal" method="post" enctype="multipart/form-data">
+        {dr_form_hidden()}
+        <div class="form-body">
+          <div class="form-group">
+            <label class="col-md-2 control-label">导入文件</label>
+            <div class="col-md-8">
+              <input type="file" name="codes_file" class="form-control" accept=".csv,.txt">
+              <span class="help-block">支持 CSV/TXT；第一列为防伪码。建议使用 UTF-8 CSV。</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">文件格式</label>
+            <div class="col-md-8">
+              <pre style="background:#f8f8f8;border:1px solid #e7e7e7;padding:12px">code,production_date,origin,message
+A1234567890123,2026-05-13,广州,该防伪码有效，为正品
+B12345678901234567,2026-05-13,广州,该防伪码有效，为正品</pre>
+              <a href="{$sample_url}" class="btn btn-xs default"><i class="fa fa-download"></i> 下载 CSV 示例</a>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <div class="row">
+            <div class="col-md-offset-2 col-md-8">
+              <button type="submit" class="btn blue"><i class="fa fa-upload"></i> 开始导入</button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <hr>
+      <h4>最近导入/发布的防伪码 <small>当前共 {$total} 条</small></h4>
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+          <thead>
+          <tr>
+            <th width="80">ID</th>
+            <th>防伪码</th>
+            <th width="160">生产时间</th>
+            <th width="160">生产地</th>
+            <th>提示语</th>
+            <th width="160">更新时间</th>
+          </tr>
+          </thead>
+          <tbody>
+          {loop $recent $t}
+          <tr>
+            <td>{$t.id}</td>
+            <td>{$t.title}</td>
+            <td>{if $t.scsj}{dr_date($t.scsj, 'Y-m-d')}{else}-{/if}</td>
+            <td>{$t.shengchandi}</td>
+            <td>{$t.tishi}</td>
+            <td>{dr_date($t.updatetime, 'Y-m-d H:i')}</td>
+          </tr>
+          {/loop}
+          </tbody>
+        </table>
+      </div>
+      {if !$recent}
+      <div class="alert alert-warning">暂无防伪码</div>
+      {/if}
+    </div>
+  </div>
+</div>
+{template "footer.html"}

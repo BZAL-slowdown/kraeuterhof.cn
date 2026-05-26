@@ -1,0 +1,24 @@
+{template "header.html"}
+<style>
+.shop-result{max-width:720px;margin:52px auto;padding:0 16px;color:#1f2933}
+.shop-result-card{background:#fff;border:1px solid #eef0f3;border-radius:8px;box-shadow:0 8px 24px rgba(20,30,45,.06);padding:32px}
+.shop-result h1{margin:0 0 22px;font-size:26px}
+.shop-result-row{margin:10px 0;color:#52606d}
+.shop-result-row strong{display:inline-block;min-width:80px;color:#1f2933}
+.shop-result-btn{display:inline-block;margin-top:22px;padding:10px 18px;background:#2f80ed;color:#fff;text-decoration:none;border-radius:4px}
+</style>
+<main class="shop-result">
+  <div class="shop-result-card">
+    <h1>支付结果</h1>
+    {if $order}
+    <div class="shop-result-row"><strong>订单号：</strong>{$order.out_trade_no}</div>
+    <div class="shop-result-row"><strong>商品：</strong>{$order.product_title}</div>
+    <div class="shop-result-row"><strong>金额：</strong>￥{$order.pay_amount}</div>
+    <div class="shop-result-row"><strong>状态：</strong>{if $order.pay_status}已支付{else}待支付{/if}</div>
+    <a class="shop-result-btn" href="{SITE_URL}index.php?s=member&app=shop&c=order&m=index">查看我的订单</a>
+    {else}
+    <div class="shop-result-row">订单不存在。</div>
+    {/if}
+  </div>
+</main>
+{template "footer.html"}

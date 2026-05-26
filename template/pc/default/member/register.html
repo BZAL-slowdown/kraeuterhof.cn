@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>会员注册 - 七叶庄园</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:#f3f6f4;color:#173b27;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif}
+    a{color:inherit;text-decoration:none}
+    .top{height:92px;display:flex;align-items:center;justify-content:center;background:#fff;border-bottom:1px solid #e3e9e5}
+    .top img{height:52px;width:auto;display:block}
+    .page{max-width:1100px;margin:0 auto;padding:44px 22px 72px;display:grid;grid-template-columns:minmax(0,.95fr) minmax(380px,480px);gap:34px;align-items:center}
+    .intro{padding:10px 0 0}
+    .eyebrow{margin:0 0 12px;color:#6f8377;font-size:13px;text-transform:uppercase}
+    h1{margin:0;font-size:38px;line-height:1.18;color:#173b27}
+    .lead{margin:18px 0 0;color:#5f7367;font-size:16px;line-height:1.9;max-width:520px}
+    .points{margin:26px 0 0;display:grid;gap:12px;max-width:520px}
+    .point{display:flex;gap:10px;align-items:flex-start;color:#395044;font-size:14px;line-height:1.7}
+    .dot{width:8px;height:8px;border-radius:50%;background:#1c5231;margin-top:8px;flex:none}
+    .card{background:#fff;border:1px solid #dde6e0;border-radius:8px;box-shadow:0 18px 45px rgba(28,82,49,.08);padding:30px}
+    .card h2{margin:0 0 6px;font-size:25px;color:#173b27}
+    .hint{margin:0 0 24px;color:#6f8377;font-size:14px;line-height:1.7}
+    .tabs{height:42px;display:grid;grid-template-columns:1fr 1fr;border:1px solid #d9e3dc;border-radius:6px;overflow:hidden;margin-bottom:20px}
+    .tabs button{border:0;background:#f8faf8;color:#51685a;font-size:14px;cursor:pointer}
+    .tabs button.active{background:#1c5231;color:#fff}
+    .form{display:grid;gap:16px}
+    label{display:block;margin-bottom:7px;color:#263b2f;font-size:14px;font-weight:600}
+    input{width:100%;height:44px;border:1px solid #cfdad3;border-radius:4px;padding:0 12px;font-size:15px;background:#fff;color:#16291d;outline:none}
+    input:focus{border-color:#1c5231;box-shadow:0 0 0 3px rgba(28,82,49,.12)}
+    .code-row{display:grid;grid-template-columns:minmax(0,1fr) 124px;gap:10px}
+    .send{height:44px;border:1px solid #1c5231;border-radius:4px;background:#fff;color:#1c5231;font-size:14px;cursor:pointer}
+    .send:disabled{border-color:#cfdad3;color:#8a9a90;background:#f4f6f5;cursor:not-allowed}
+    .submit{height:46px;border:0;border-radius:4px;background:#1c5231;color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+    .submit:disabled{background:#9bb3a4;cursor:not-allowed}
+    .msg{display:none;padding:11px 12px;border-radius:4px;font-size:14px;line-height:1.6}
+    .msg.ok{display:block;background:#e8f5ee;color:#126c3d;border:1px solid #bde2ca}
+    .msg.err{display:block;background:#fff1f0;color:#9f1d16;border:1px solid #f0c5c0}
+    .foot{margin-top:22px;padding-top:18px;border-top:1px solid #edf1ee;color:#63766a;font-size:14px;text-align:center}
+    .foot a{color:#1c5231;font-weight:600}
+    @media(max-width:900px){.page{grid-template-columns:1fr;max-width:560px}.intro{display:none}.card{padding:24px}.top{height:78px}.top img{height:46px}}
+    @media(max-width:520px){.page{padding:28px 16px 54px}.code-row{grid-template-columns:1fr}.send{width:100%}h1{font-size:30px}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <a href="{SITE_URL}"><img src="/uploadfile/202512/c35e2de6b2eae6a.png" alt="七叶庄园"></a>
+  </header>
+
+  <main class="page">
+    <section class="intro">
+      <p class="eyebrow">MEMBER ACCOUNT</p>
+      <h1>创建七叶庄园会员账号</h1>
+      <p class="lead">支持手机号或邮箱注册，完成验证码校验后创建会员账号。注册成功后可在会员中心管理资料、收货信息和订单记录。</p>
+      <div class="points">
+        <div class="point"><span class="dot"></span><span>手机号注册适合移动端用户，邮箱注册适合桌面端和海外场景。</span></div>
+        <div class="point"><span class="dot"></span><span>验证码 10 分钟内有效，60 秒内不可重复发送。</span></div>
+        <div class="point"><span class="dot"></span><span>收货资料后续可在会员中心完善，登录后下单更顺手。</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>注册账号</h2>
+      <p class="hint">使用手机号或邮箱完成验证。</p>
+      <div class="tabs">
+        <button type="button" class="active" data-type="phone">手机注册</button>
+        <button type="button" data-type="email">邮箱注册</button>
+      </div>
+      <form class="form" id="registerForm">
+        {dr_form_hidden()}
+        <input type="hidden" name="type" id="type" value="phone">
+        <div>
+          <label id="accountLabel" for="account">手机号</label>
+          <input id="account" name="account" autocomplete="username" placeholder="请输入手机号">
+        </div>
+        <div>
+          <label for="code">验证码</label>
+          <div class="code-row">
+            <input id="code" name="code" autocomplete="one-time-code" placeholder="6位验证码">
+            <button class="send" id="sendCode" type="button">获取验证码</button>
+          </div>
+        </div>
+        <div>
+          <label for="display_name">用户名称</label>
+          <input id="display_name" name="display_name" autocomplete="nickname" placeholder="用于会员中心展示">
+        </div>
+        <div>
+          <label for="password">登录密码</label>
+          <input id="password" name="password" type="password" autocomplete="new-password" placeholder="请输入登录密码">
+        </div>
+        <div>
+          <label for="password2">确认密码</label>
+          <input id="password2" name="password2" type="password" autocomplete="new-password" placeholder="请再次输入密码">
+        </div>
+        <div id="message" class="msg"></div>
+        <button class="submit" id="submitBtn" type="submit">立即注册</button>
+      </form>
+      <div class="foot">已有账号？<a href="/index.php?s=shop&c=login&m=index&back=%2Findex.php%3Fs%3Dmember%26app%3Dshop%26c%3Dcenter%26m%3Dindex">去登录</a></div>
+    </section>
+  </main>
+
+  <script>
+    const sendUrl = '/index.php?s=shop&c=register&m=send_code';
+    const registerUrl = '/index.php?s=shop&c=register&m=create';
+    const tabs = document.querySelectorAll('.tabs button');
+    const typeInput = document.getElementById('type');
+    const account = document.getElementById('account');
+    const accountLabel = document.getElementById('accountLabel');
+    const sendButton = document.getElementById('sendCode');
+    const submitButton = document.getElementById('submitBtn');
+    const form = document.getElementById('registerForm');
+    const message = document.getElementById('message');
+    let timer = 0;
+    let ticker = null;
+
+    function showMessage(text, ok) {
+      message.textContent = text || '';
+      message.className = text ? 'msg ' + (ok ? 'ok' : 'err') : 'msg';
+    }
+
+    function csrfInput() {
+      return form.querySelector('input[name^="csrf_"]');
+    }
+
+    function appendToken(data) {
+      const token = csrfInput();
+      if (token && !data.has(token.name)) {
+        data.append(token.name, token.value);
+      }
+      return data;
+    }
+
+    function refreshToken(res) {
+      if (!res || !res.token || !res.token.name || !res.token.value) {
+        return;
+      }
+      let token = form.querySelector('input[name="' + res.token.name + '"]');
+      if (!token) {
+        token = document.createElement('input');
+        token.type = 'hidden';
+        token.name = res.token.name;
+        form.appendChild(token);
+      }
+      token.value = res.token.value;
+    }
+
+    function post(url, data) {
+      return fetch(url, {
+        method: 'POST',
+        body: data,
+        credentials: 'same-origin',
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+      }).then(function (response) {
+        return response.text().then(function (text) {
+          try {
+            return JSON.parse(text);
+          } catch (e) {
+            throw new Error(text ? text.replace(/<[^>]+>/g, '').trim().slice(0, 120) : '接口没有返回有效数据');
+          }
+        });
+      });
+    }
+
+    function countdown() {
+      clearInterval(ticker);
+      timer = 60;
+      sendButton.disabled = true;
+      sendButton.textContent = timer + '秒后重发';
+      ticker = setInterval(function () {
+        timer -= 1;
+        sendButton.textContent = timer + '秒后重发';
+        if (timer <= 0) {
+          clearInterval(ticker);
+          sendButton.disabled = false;
+          sendButton.textContent = '获取验证码';
+        }
+      }, 1000);
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (item) { item.classList.remove('active'); });
+        tab.classList.add('active');
+        typeInput.value = tab.dataset.type;
+        account.value = '';
+        accountLabel.textContent = tab.dataset.type === 'phone' ? '手机号' : '邮箱';
+        account.placeholder = tab.dataset.type === 'phone' ? '请输入手机号' : '请输入邮箱';
+        showMessage('', true);
+      });
+    });
+
+    sendButton.addEventListener('click', function () {
+      const data = new FormData();
+      data.append('account', account.value.trim());
+      data.append('type', typeInput.value);
+      sendButton.disabled = true;
+      post(sendUrl, appendToken(data)).then(function (res) {
+        refreshToken(res);
+        showMessage(res.msg || '验证码已发送', !!res.code);
+        if (res.code) {
+          countdown();
+        } else {
+          sendButton.disabled = false;
+        }
+      }).catch(function (error) {
+        showMessage(error && error.message ? error.message : '发送失败，请稍后再试', false);
+        sendButton.disabled = false;
+      });
+    });
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      const data = new FormData(form);
+      submitButton.disabled = true;
+      post(registerUrl, data).then(function (res) {
+        refreshToken(res);
+        showMessage(res.msg || (res.code ? '注册成功' : '注册失败'), !!res.code);
+        if (res.code && res.data && res.data.url) {
+          window.location.href = res.data.url;
+        } else {
+          submitButton.disabled = false;
+        }
+      }).catch(function (error) {
+        showMessage(error && error.message ? error.message : '注册失败，请稍后再试', false);
+        submitButton.disabled = false;
+      });
+    });
+  </script>
+</body>
+</html>

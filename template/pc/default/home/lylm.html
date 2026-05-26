@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$cat['name']}</title>
+    <style>
+        /* 重置默认样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 让body和html占满整个视口 */
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden; /* 隐藏滚动条，确保满屏无滚动 */
+        }
+
+        /* 页面容器：包含标题+留言板块区域，垂直布局 */
+        .page-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        /* 顶部标题样式 */
+        .page-title {
+            height: 60px; /* 标题高度，可调整 */
+            line-height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 2px solid #e6f7ff;
+            margin-bottom: 10px;
+        }
+
+        /* 留言板块容器：Flex布局，均匀分布，自动换行，占满剩余视口高度 */
+        .message-container {
+            flex: 1; /* 占满标题外的剩余高度 */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-content: space-around;
+        }
+
+        /* 单个留言名片样式：相对定位，替换原图片为名片内容 */
+        .message-card {
+            width: calc(25% - 20px); /* 4列布局，减去间距 */
+            height: calc(33.33% - 20px); /* 3行布局，减去间距 */
+            border-radius: 8px;
+            position: relative; /* 作为弹窗定位的参考 */
+            overflow: hidden; /* 隐藏超出部分 */
+            transition: all 0.3s ease; /* hover动效 */
+            cursor: pointer;
+            background-color: #f0f8ff; /* 名片背景色 */
+            border: 1px solid #e6f7ff;
+        }
+
+        /* 名片内容容器：垂直布局展示姓名/电话/时间（名片仅展示核心信息） */
+        .message-card-content {
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 8px; /* 内容项间距 */
+        }
+
+        /* 姓名样式 */
+        .message-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* 联系电话样式 */
+        .message-phone {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 留言时间样式 */
+        .message-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* 鼠标悬浮效果 */
+        .message-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            background-color: #e6f7ff;
+        }
+
+        /* 弹窗遮罩层 */
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.5);
+            display: none; /* 默认隐藏 */
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        /* 弹窗内容容器 */
+        .modal-content {
+            width: 80%;
+            max-width: 500px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        /* 弹窗标题栏 */
+        .modal-header {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* 弹窗信息项 */
+        .modal-info-item {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        /* 弹窗信息标签 */
+        .modal-label {
+            display: inline-block;
+            width: 80px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        /* 弹窗留言内容样式 */
+        .modal-message {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre-wrap; /* 保留换行 */
+        }
+
+        /* 弹窗关闭按钮 */
+        .modal-close {
+            margin-top: 20px;
+            padding: 8px 20px;
+            background-color: #1890ff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background-color: #096dd9;
+        }
+
+        /* 响应式适配：屏幕宽度小于768px时改为3列布局 */
+        @media (max-width: 768px) {
+            .message-card {
+                width: calc(33.33% - 20px);
+                height: calc(25% - 20px);
+            }
+            .page-title {
+                font-size: 20px;
+                height: 50px;
+                line-height: 50px;
+            }
+            .message-name {
+                font-size: 16px;
+            }
+            .message-phone {
+                font-size: 13px;
+            }
+        }
+
+        /* 响应式适配：屏幕宽度小于480px时改为2列布局 */
+        @media (max-width: 480px) {
+            .message-card {
+                width: calc(50% - 20px);
+                height: calc(16.66% - 20px);
+            }
+            .page-title {
+                font-size: 18px;
+                height: 40px;
+                line-height: 40px;
+            }
+            .message-name {
+                font-size: 14px;
+            }
+            .message-phone {
+                font-size: 12px;
+            }
+            .message-time {
+                font-size: 11px;
+            }
+            .modal-content {
+                width: 90%;
+                padding: 20px;
+            }
+            .modal-header {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- 顶部标题 -->
+        <div class="page-title">{$cat['name']}</div>
+        
+        <!-- 留言名片容器 -->
+        <div class="message-container">
+{form form=zxly order=inputtime IN_zxly=$cat['id'] page=1 pagesize=12 urlrule=$urlrule}
+            <!-- 留言名片1 -->
+            <div class="message-card" 
+                 data-name="{$t.title}" 
+                 data-phone="{$t.author}" 
+                 data-time="{$t.inputtime}"
+                 data-content="{$t.liuyanxinxi}">
+                <div class="message-card-content">
+                    <div class="message-name">{$t.title}</div>
+                    <div class="message-phone">{$t.author}</div>
+                    <div class="message-phone">{$t.liuyanxinxi}</div>
+                    <div class="message-time">{$t.inputtime}</div>
+                </div>
+            </div>
+            {/form}
+        </div>
+       <div class="pager">{$pages}</div>
+            <style>
+                /*分页*/
+                
+                .pager {
+                    text-align: center;
+                    margin: 20px 0;
+                }
+                
+                .pager ul {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center
+                }
+                
+                .pager ul li {
+                    display: inline-block;
+                }
+                
+                .pager ul li a {
+                    padding: 5px 15px;
+                    border: #dddddd solid 1px;
+                    margin-left: -1px;
+                    display: inline-block;
+                }
+                
+                .pager ul li a:hover {
+                    border-color: #70c4f3;
+                    background-color: #70c4f3;
+                    color: #FFF
+                }
+                
+                .pager ul .active a {
+                    border: #3ea8e2 solid 1px;
+                    display: inline-block;
+                    background-color: #3ea8e2;
+                    color: #fff;
+                }
+                
+                .pager ul a:not([href]):not([class]):hover {
+                    border: #dddddd solid 1px;
+                    background-color: #fff
+                }
+                
+                .pager ul .active a:hover {
+                    color: #fff;
+                    border: #3ea8e2 solid 1px !important;
+                    background-color: #3ea8e2 !important
+                }
+            </style>
+    </div>
+
+    <!-- 弹窗容器 -->
+    <div class="modal-mask" id="messageModal">
+        <div class="modal-content">
+            <div class="modal-header">留言详情</div>
+            <div class="modal-info-item">
+                <span class="modal-label">姓名：</span>
+                <span id="modalName"></span>
+            </div>
+            <div class="modal-info-item">
+                <span class="modal-label">电话：</span>
+                <span id="modalPhone"></span>
+            </div>
+            <div class="modal-info-item">
+                <span class="modal-label">时间：</span>
+                <span id="modalTime"></span>
+            </div>
+            <div class="modal-info-item">
+                <span class="modal-label">留言：</span>
+                <div id="modalContent" class="modal-message"></div>
+            </div>
+            <button class="modal-close" id="modalCloseBtn">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        // 获取弹窗元素
+        const modal = document.getElementById('messageModal');
+        const modalName = document.getElementById('modalName');
+        const modalPhone = document.getElementById('modalPhone');
+        const modalTime = document.getElementById('modalTime');
+        const modalContent = document.getElementById('modalContent');
+        const closeBtn = document.getElementById('modalCloseBtn');
+
+        // 给所有名片添加点击事件
+        const messageCards = document.querySelectorAll('.message-card');
+        messageCards.forEach(card => {
+            card.addEventListener('click', () => {
+                // 获取名片的自定义数据
+                const name = card.dataset.name;
+                const phone = card.dataset.phone;
+                const time = card.dataset.time;
+                const content = card.dataset.content;
+
+                // 填充弹窗内容
+                modalName.textContent = name;
+                modalPhone.textContent = phone;
+                modalTime.textContent = time;
+                modalContent.textContent = content;
+
+                // 显示弹窗
+                modal.style.display = 'flex';
+                // 禁止body滚动（可选）
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        // 关闭弹窗
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        // 点击遮罩层关闭弹窗
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    </script>
+</body>
+</html>

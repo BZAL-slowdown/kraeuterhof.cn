@@ -1,0 +1,402 @@
+{template "header.html"}
+
+<style>
+.labmr10{ margin-right: 10px; }
+.labtxt{color: #999;}
+.dis{ display: none }
+.custom-header{ height: 30px; line-height: 30px; background: #2f353b; color: #fff; text-align: center; border-radius: 3px; margin-bottom: 3px;}
+.ms-container .ms-list{ height: 260px!important; }
+.ms-container{ width: 430px!important; }
+
+.CodeMirror-wrap{ border-radius: 6px; overflow: hidden; }
+</style>
+
+<link href="{THEME_PATH}assets/global/plugins/codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
+<link href="{THEME_PATH}assets/global/plugins/codemirror/theme/material.css" rel="stylesheet" type="text/css" />
+
+<script src="{THEME_PATH}assets/global/plugins/codemirror/lib/codemirror.js" type="text/javascript"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/javascript/javascript.js" type="text/javascript"></script>
+
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/xml/xml.js" type="text/javascript"></script>
+
+<!-- 因为HTML混合语言依赖Javascript、XML、CSS语言支持，所以都要引入 -->
+<script src="{THEME_PATH}assets/global/plugins/codemirror/addon/edit/matchbrackets.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/addon/selection/active-line.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/addon/selection/selection-pointer.js"></script>
+
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/xml/xml.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/javascript/javascript.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/css/css.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+
+
+<div class="row">
+
+<form class="form-horizontal" id="myform_1">
+    {dr_form_hidden()}
+
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet light bordered myportlet ">
+            <div class="portlet-title tabbable-line">
+                <div class="caption">
+                    <span class="caption-subject font-green-sharp">
+                        <i class="fa fa-cog"></i> Show.html 页面字段
+                    </span>
+                    <span class="caption-helper">
+                        内容页字段调用
+                    </span>
+                    
+                </div>
+            </div>
+            <div class="portlet-body form">
+                    <div class="form-body">
+
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">选择</label>
+                        <div class="col-md-9">
+                            <select class="form-control" name="contentshow" id="contentshow" onchange="single_cat(this);">
+                                <option value="">选择内容</option>
+                                <option value="meta_title">页面标题</option>
+                                <option value="meta_keywords">页面关键字</option>
+                                <option value="meta_description">页面头部描述</option>
+                                <option value="cat">栏目的内容数组</option>
+                                <option value="parent">父栏目数组</option>
+                                <option value="related">栏目的关系循环</option>
+                                <option value="catid">所属栏目id</option>
+                                <option value="prev_page">上一篇数组</option>
+                                <option value="next_page">下一篇数组</option>
+                                <option value="tags">内容的tag数组</option>
+                                <option value="title">文章标题</option>
+                                <option value="keywords">文章关键字</option>
+                                <option value="description">文章描述</option>
+                                <option value="hits">文章浏览数</option>
+                                <option value="uid">作者id</option>
+                                <option value="author">作者账号</option>
+                                <option value="content">文章内容</option>
+                                <option value="url">文章地址</option>
+                                <option value="inputtime">发布时间</option>
+                                <option value="updatetime">更新时间</option>
+                                <option value="comments">评论数，固定</option>
+                                <option value="favorites">收藏数</option>
+                                <option value="avgsort">评论平均分</option>
+                                <option value="support">支持数量</option>
+                                <option value="oppose">反对数量</option>
+                                <option value="donation">捐赠总金额</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    </div>
+            </div>
+        </div>
+
+
+        <div class="portlet light bordered myportlet ">
+            <div class="portlet-title tabbable-line">
+                <div class="caption">
+                    <span class="caption-subject font-blue-sharp">
+                        <i class="fa fa-cog"></i> 字段全解析
+                    </span>
+                    <span class="caption-helper">
+                        智能调用字段
+                    </span>
+                    
+                </div>
+            </div>
+
+        <div class="portlet-body form">
+                <div class="form-body">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">模块</label>
+                        <div class="col-md-10">
+                            <label class="labmr10">
+                                <select class="form-control" name="module" id="module" onchange="single_cat(this);">
+                                    <option value="0">默认</option>
+                                    {cache name=module-content}
+                                    <option value="{$t.dirname}">{$t.name}</option>
+                                    {/cache}
+                                </select>
+                            </label>
+                            <label>位置</label>
+                            <label class="labmr10">
+                                <select class="form-control" name="page" id="page" onchange="single_cat(this);">
+                                    <option value="1">循环中</option>
+                                    <option value="2">show页面</option>
+                                </select>
+                            </label>
+                            <label>变量</label>
+                            <label class="labmr10"><input class="form-control " type="text" name="return" value="t" style="width:80px;"/></label>
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" style="padding-top: 0px;">
+                            <a class="btn dark">字段</a>
+                            <a id='select-all' class="btn green" style="margin: 10px 0;">全选</a>
+                            <a id='deselect-all' class="btn grey">移除</a>
+                        </label>
+                        <div class="col-md-9">
+                                <select class="form-control" name="field[]" id="field" multiple="multiple" class="multi-select">
+                                    <option value="">请选择模块</option>
+                                </select>
+                        </div>
+                        <div style="padding-top: 0px;" class="col-md-2">
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-md-offset-2 col-md-9">
+                            <button type="button" id="1" class="btn green">生成标签</button>
+                            <a href="javascript:dr_help_labe(15);" class="btn default">查看手册</a>
+                            <a href="javascript:dr_help_labe(102);" class="btn default">字段输出</a>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        </div>
+    </div>
+
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet light bordered myportlet copyinput">
+
+            <div class="portlet-title tabbable-line">
+                <div class="caption">
+                    <i class="fa fa-cog"></i>
+                    <span class="caption-subject">生成</span>
+                </div>
+            </div>
+            <div class="portlet-body form form-horizontal">
+                <div class="form-body" id="listlab">
+
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <textarea id="labelling" class="form-control" rows="30" name="labelling" ></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+</form>
+
+</div>
+
+<link href="{THEME_PATH}assets/global/plugins/jquery-multi-select/css/multi-select.css" rel="stylesheet" type="text/css" />
+<script src="{THEME_PATH}assets/global/plugins/jquery-multi-select/js/jquery.multi-select.js" type="text/javascript"></script>
+
+<script>
+var mixedMode = {
+    name: "htmlmixed",
+    scriptTypes: [{
+            matches: /\/x-handlebars-template|\/x-mustache/i,
+            mode: null
+        },
+        {
+            matches: /(text|application)\/(x-)?vb(a|script)/i,
+            mode: "vbscript"
+        }
+    ]
+};
+var editor = CodeMirror.fromTextArea(document.getElementById("labelling"), {
+    mode: mixedMode,
+    selectionPointer: true,
+    lineNumbers: true,
+    lineWrapping: true, // 自动换行
+    styleActiveLine: true,
+    theme: 'material', // 使用monokai模版
+    matchBrackets: true
+});
+editor.setSize('auto','580px');
+
+
+
+
+</script>
+
+
+<script type="text/javascript">
+
+jQuery(document).ready(function() {
+    $('#field').multiSelect();
+});
+
+$('#select-all').click(function(){
+  $('#field').multiSelect('select_all');
+  return false;
+});
+$('#deselect-all').click(function(){
+  $('#field').multiSelect('deselect_all');
+  return false;
+});
+//点击复制
+$("#listlab input").click(function() {
+         this.select();
+          // 执行浏览器复制命令
+         document.execCommand("Copy");
+         //提示已复制
+         dr_cmf_tips(1, '已复制');
+})
+
+
+function single_cat(select) {
+
+    if (select.id == 'site') {
+        $('#module').empty();
+
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: '{dr_url("labelling/allfield/sitemodule")}',
+                data: {site: select.value, {csrf_token()}: "{csrf_hash()}"},
+
+                success: function(json) {
+                    if (json.code == 1) {
+                        $('#module').append(json.data);
+                    } else {
+                        dr_cmf_tips(0, json.msg);
+                    }
+                    return false;
+                },
+                error: function(HttpRequest, ajaxOptions, thrownError) {
+                    dr_ajax_alert_error(HttpRequest, ajaxOptions, thrownError)
+                }
+            });
+    }
+
+    if (select.id == 'module') {
+        $('#field').empty();
+
+        if (select.value != 0) {
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: '{dr_url("labelling/allfield/field")}',
+                data: { module: select.value, {csrf_token()}: "{csrf_hash()}" },
+
+                success: function(json) {
+                    if (json.code == 1) {
+                        $('#field').append(json.data);
+                        $('#field').multiSelect('refresh');
+                    } else {
+                        dr_cmf_tips(0, json.msg);
+                    }
+                    return false;
+                },
+                error: function(HttpRequest, ajaxOptions, thrownError) {
+                    dr_ajax_alert_error(HttpRequest, ajaxOptions, thrownError)
+                }
+            });
+        }
+
+    }
+
+    if (select.id == 'contentshow') {
+
+        var textarea = '#listlab #labelling';
+        $(textarea).empty();
+
+        if (select.value != 0) {
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: '{dr_url("labelling/content/show")}',
+                data: { show:select.value,{csrf_token()}: "{csrf_hash()}" },
+
+                success: function(json) {
+                    if (json.code == 1) {
+                //$(textarea).html(json.msg);
+
+$(textarea).empty();
+$(textarea).text(json.msg);
+editor.getDoc().setValue(json.msg);
+editor.refresh();
+
+
+
+
+
+
+
+
+                    } else {
+                        dr_cmf_tips(0, json.msg);
+                    }
+                    return false;
+                },
+                error: function(HttpRequest, ajaxOptions, thrownError) {
+                    dr_ajax_alert_error(HttpRequest, ajaxOptions, thrownError)
+                }
+            });
+        }
+
+    }
+
+}
+
+
+
+
+$(".form button").click(function() {
+    var id = $(this).attr('id');
+    var textarea = '#myform_' + id + ' #labelling';
+    var form = '#myform_' + id;
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: '{dr_url("labelling/allfield/labelling")}&id=' + id,
+        data: $(form).serialize(),
+        success: function(json) {
+            if (json.code == 1) {
+                //$(textarea).html(json.msg);
+$(textarea).empty();
+$(textarea).text(json.msg);
+editor.getDoc().setValue(json.msg);
+editor.refresh();
+            } else {
+                $(textarea).html(json.data);
+                dr_cmf_tips(0, json.msg);
+            }
+            return false;
+        },
+        error: function(HttpRequest, ajaxOptions, thrownError) {
+            dr_ajax_alert_error(HttpRequest, ajaxOptions, thrownError)
+        }
+    });
+
+    //console.log("click");
+});
+</script>
+<script type="text/javascript">
+    function dr_help_labe(id) {
+        if (is_oemcms == 1) {
+            dr_tips(1, '请联系开发商');
+            return;
+        }
+        layer.open({
+            type: 2,
+            title: '<i class="fa fa-question-circle"></i> 在线帮助',
+            shadeClose: true,
+            scrollbar: false,
+            shade: 0,
+            area: ['80%', '90%'],
+            content: 'https://www.xunruicms.com/index.php?s=doc&c=show&id='+id+'&is_phpcmf=cms'
+        });
+    }
+</script>
+{template "footer.html"}

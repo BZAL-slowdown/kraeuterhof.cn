@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的订单 - 七叶庄园</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#f3f6f4;color:#1f2f25;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif}
+    a{color:inherit;text-decoration:none}
+    .top{background:#fff;border-bottom:1px solid #e1e7e3}.top-inner{max-width:1200px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .logo img{height:52px;width:auto;display:block}.nav{display:flex;align-items:center;gap:8px;color:#4c5f52;font-size:14px;white-space:nowrap}
+    .nav a{height:36px;display:inline-flex;align-items:center;padding:0 12px;border-radius:4px}.nav a:hover,.nav .active{background:#eef5f0;color:#1c5231}
+    .wrap{max-width:1200px;margin:30px auto 68px;padding:0 24px}
+    .head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:18px}
+    .eyebrow{margin:0 0 8px;color:#6f8377;font-size:13px;text-transform:uppercase}
+    h1{margin:0;color:#173b27;font-size:30px;line-height:1.25}.desc{margin:10px 0 0;color:#63766a;line-height:1.7;font-size:15px}
+    .btn{height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 16px;border-radius:4px;background:#1c5231;color:#fff;font-size:14px;border:1px solid #1c5231}
+    .card{background:#fff;border:1px solid #e1e7e3;border-radius:8px;box-shadow:0 10px 28px rgba(28,82,49,.05);overflow:hidden}
+    .order{display:grid;grid-template-columns:1.05fr 1.15fr .5fr .55fr .55fr;gap:16px;align-items:center;padding:18px 20px;border-top:1px solid #edf2ef}
+    .order:first-child{border-top:0}.order-head{background:#f8faf8;color:#6f8377;font-size:13px;font-weight:700}.order-body{font-size:14px}
+    .order-no{font-family:Arial,sans-serif;color:#1c5231;word-break:break-all}.product{font-weight:700;color:#263b2f;line-height:1.5}.muted{margin-top:5px;color:#7a8b80;font-size:13px}
+    .qty,.money{text-align:left}.money{font-weight:800;color:#b42318;white-space:nowrap}.badge{display:inline-flex;height:28px;align-items:center;padding:0 10px;border-radius:999px;background:#eceff1;color:#546e7a;font-size:12px;white-space:nowrap}
+    .badge.ok{background:#e5f4ec;color:#147a46}.badge.warn{background:#fff3d6;color:#946200}.pay{display:inline-flex;height:32px;align-items:center;justify-content:center;padding:0 12px;border-radius:4px;background:#1c5231;color:#fff;font-size:13px;white-space:nowrap}
+    .empty{padding:58px 22px;text-align:center;color:#6f8377;line-height:1.8}.empty b{display:block;color:#173b27;font-size:20px;margin-bottom:8px}
+    .notice{margin-top:16px;padding:15px 18px;border-radius:6px;background:#fff8e8;border:1px solid #f1dfb4;color:#725117;font-size:13px;line-height:1.8}
+    @media(max-width:920px){.top-inner,.head{display:block}.nav{margin-top:14px;flex-wrap:wrap}.head .btn{margin-top:16px}.order-head{display:none}.order{grid-template-columns:1fr;gap:8px}.order-body{padding:18px}.order-body>div:before{display:block;color:#7a8b80;font-size:12px;margin-bottom:3px}.order-body>div:nth-child(1):before{content:"订单号"}.order-body>div:nth-child(2):before{content:"商品"}.order-body>div:nth-child(3):before{content:"数量"}.order-body>div:nth-child(4):before{content:"金额"}.order-body>div:nth-child(5):before{content:"状态"}}
+    @media(max-width:720px){.wrap{padding:0 16px}.logo img{height:46px}h1{font-size:25px}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="logo" href="{SITE_URL}"><img src="/uploadfile/202512/c35e2de6b2eae6a.png" alt="七叶庄园"></a>
+      <nav class="nav">
+        <a href="{SITE_URL}">返回首页</a>
+        <a href="{SITE_URL}index.php?s=member&app=shop&c=center&m=index">会员中心</a>
+        <a href="{SITE_URL}index.php?s=member&app=shop&c=profile&m=index">个人资料</a>
+        <a href="{SITE_URL}index.php?s=member&app=shop&c=address&m=index">收货资料</a>
+        <a class="active" href="{SITE_URL}index.php?s=member&app=shop&c=order&m=index">我的订单</a>
+        <a href="{SITE_URL}index.php?s=shop&c=home&m=logout">退出登录</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="head">
+      <div>
+        <p class="eyebrow">Order Center</p>
+        <h1>我的订单</h1>
+        <p class="desc">查看当前会员账号提交的订单。支付资料配置完成后，待支付订单可继续发起微信 H5 支付。</p>
+      </div>
+      <a class="btn" href="{SITE_URL}">继续选购</a>
+    </div>
+
+    <section class="card">
+      <div class="order order-head">
+        <div>订单号</div>
+        <div>商品</div>
+        <div>数量</div>
+        <div>金额</div>
+        <div>状态</div>
+      </div>
+      {loop $orders $t}
+      <div class="order order-body">
+        <div>
+          <div class="order-no">{$t.out_trade_no}</div>
+          <div class="muted">{dr_date($t.created_at, 'Y-m-d H:i')}</div>
+        </div>
+        <div>
+          <div class="product">{$t.product_title}</div>
+          {if $t.sku}<div class="muted">规格：{$t.sku}</div>{/if}
+        </div>
+        <div class="qty">{$t.quantity}</div>
+        <div class="money">￥{$t.pay_amount}</div>
+        <div>
+          {if $t.pay_status}
+          <span class="badge ok">已支付</span>
+          {else}
+          <a class="pay" href="{SITE_URL}index.php?s=shop&c=pay&m=index&out_trade_no={$t.out_trade_no}">继续支付</a>
+          <div class="muted">待支付</div>
+          {/if}
+        </div>
+      </div>
+      {/loop}
+      {if !$orders}<div class="empty"><b>暂无订单</b>返回官网选择产品后，订单会显示在这里。</div>{/if}
+    </section>
+
+    <div class="notice">说明：订单支付状态以微信支付回调为准。当前 H5 支付资料未配置完成时，继续支付会提示支付通道暂不可用。</div>
+  </main>
+</body>
+</html>

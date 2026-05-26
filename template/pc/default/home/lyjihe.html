@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$cat['name']}</title>
+    <style>
+        /* 重置默认样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 新增：底部背景图片容器 */
+        .bottom-bg-img {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100vw;
+            height: auto; /* 保持图片比例 */
+            z-index: -1; /* 置于所有内容下方 */
+        }
+        .bottom-bg-img img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* 登录遮罩层：默认覆盖整个页面 */
+        .login-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* 最高层级，覆盖所有内容 */
+        }
+
+        /* 登录弹窗样式 */
+        .login-box {
+            width: 90%;
+            max-width: 400px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        /* 登录标题 */
+        .login-title {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        /* 密码输入框 */
+        .login-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .login-input:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+        }
+
+        /* 登录按钮 */
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #1890ff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background-color: #096dd9;
+        }
+
+        /* 错误提示 */
+        .login-error {
+            color: #ff4d4f;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none; /* 默认隐藏 */
+        }
+
+        /* 让body和html占满整个视口 */
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden; /* 保留原有隐藏滚动条设置 */
+            position: relative; /* 作为底部图片定位参考 */
+        }
+
+        /* 页面容器：包含标题+栏目区域，垂直布局 */
+        .page-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            display: none; /* 默认隐藏，登录后显示 */
+            padding-bottom: 120px; /* 预留底部图片空间，避免内容被遮挡 */
+            position: relative;
+            z-index: 1; /* 确保内容在图片上方 */
+        }
+
+        /* 顶部标题样式 */
+        .page-title {
+            height: 60px; /* 标题高度，可调整 */
+            line-height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 2px solid #e6f7ff;
+            margin-bottom: 10px;
+        }
+
+        /* 栏目容器：Flex布局，均匀分布，自动换行，占满剩余视口高度 */
+        .column-container {
+            flex: 1; /* 占满标题外的剩余高度 */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-content: space-around;
+        }
+
+        /* 单个栏目样式：相对定位，图片满栏，文字悬浮 */
+        .column-item {
+            width: calc(25% - 20px); /* 4列布局，减去间距 */
+            height: calc(33.33% - 20px); /* 3行布局，减去间距 */
+            border-radius: 8px;
+            position: relative; /* 作为文字/链接定位的父容器 */
+            overflow: hidden; /* 隐藏图片超出部分 */
+            transition: all 0.3s ease; /* hover动效 */
+            cursor: pointer;
+        }
+
+        /* 核心修改：超链接覆盖整个栏目区域 */
+        .column-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* 确保链接在图片/文字上层，可点击 */
+            text-decoration: none; /* 去除链接下划线 */
+        }
+
+        /* 栏目图片：满栏显示 */
+        .column-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 图片等比缩放填充，不拉伸 */
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 0; /* 图片在链接下层，不遮挡点击 */
+        }
+
+        /* 栏目文字：悬浮在图片上方，居中显示 */
+        .column-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* 文字阴影，提升可读性 */
+            z-index: 2; /* 文字在链接上层，显示正常 */
+            pointer-events: none; /* 文字不拦截点击事件，确保点击文字也触发链接 */
+        }
+
+        /* 鼠标悬浮效果 */
+        .column-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .column-item:hover .column-img {
+            opacity: 0.85; /* 图片轻微透明 */
+            transform: scale(1.05); /* 图片轻微放大 */
+        }
+
+        /* 响应式适配：屏幕宽度小于768px时改为3列布局 */
+        @media (max-width: 768px) {
+            .column-item {
+                width: calc(33.33% - 20px);
+                height: calc(25% - 20px);
+            }
+            .page-title {
+                font-size: 20px;
+                height: 50px;
+                line-height: 50px;
+            }
+            .login-box {
+                padding: 20px;
+            }
+            .login-title {
+                font-size: 20px;
+            }
+            .page-container {
+                padding-bottom: 100px; /* 移动端调整底部预留空间 */
+            }
+        }
+
+        /* 响应式适配：屏幕宽度小于480px时改为2列布局 */
+        @media (max-width: 480px) {
+            .column-item {
+                width: calc(50% - 20px);
+                height: calc(16.66% - 20px);
+            }
+            .page-title {
+                font-size: 18px;
+                height: 40px;
+                line-height: 40px;
+            }
+            .column-text {
+                font-size: 16px;
+            }
+            .login-input {
+                padding: 10px 12px;
+            }
+            .login-btn {
+                padding: 10px;
+                font-size: 14px;
+            }
+            .page-container {
+                padding-bottom: 80px; /* 小屏调整底部预留空间 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 新增：底部背景图片容器（放在body最顶部，确保层级正确） -->
+    <div class="bottom-bg-img">
+        <!-- 替换为你的图片URL地址 -->
+        <img src="{dr_get_file($cat['thumb'])}" alt="底部背景图">
+    </div>
+
+    <!-- 登录验证弹窗 -->
+    <div class="login-mask" id="loginMask">
+        <div class="login-box">
+            <h3 class="login-title">请输入访问密码</h3>
+            <input type="password" class="login-input" id="passwordInput" placeholder="请输入密码">
+            <button class="login-btn" id="loginBtn">确认登录</button>
+            <div class="login-error" id="errorTip">密码错误，请重新输入！</div>
+        </div>
+    </div>
+
+    <!-- 核心内容容器（默认隐藏） -->
+    <div class="page-container" id="pageContainer">
+        <!-- 顶部标题 -->
+        <div class="page-title">{$cat['name']}</div>
+        
+        <!-- 栏目容器 -->
+        <div class="column-container">
+            {category module=ly pid=0}
+            <div class="column-item">
+                <a href="{$t.url}" target="_blank" class="column-link"></a>
+                <div class="column-text">{$t.name}</div>
+                <div class="column-text" style="top:30px">当前栏目有{count action=form form=zxly zxly=$t.id}条留言</div>
+                <img class="column-img" src="{dr_thumb($t.thumb)}" alt="{$t.name}">
+                
+            </div>
+            {/category}
+        </div>
+    </div>
+<?php $mysite=dr_site_value('qianduanmima');?>
+    <script>
+        // 从PHP变量$mysite读取密码（需确保$mysite包含password字段，可根据实际字段名调整）
+        const CORRECT_PASSWORD = "{$mysite}"; // 核心修改：对接PHP配置
+
+        // 获取DOM元素
+        const loginMask = document.getElementById('loginMask');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorTip = document.getElementById('errorTip');
+        const pageContainer = document.getElementById('pageContainer');
+
+        // 登录验证逻辑
+        function verifyPassword() {
+            const inputPwd = passwordInput.value.trim();
+            // 清空错误提示
+            errorTip.style.display = 'none';
+
+            // 验证密码（兼容$mysite密码为空的情况，避免报错）
+            if (!CORRECT_PASSWORD) {
+                errorTip.textContent = '密码配置异常，请联系管理员！';
+                errorTip.style.display = 'block';
+                return;
+            }
+            if (inputPwd === CORRECT_PASSWORD) {
+                // 密码正确：隐藏登录层，显示页面内容
+                loginMask.style.display = 'none';
+                pageContainer.style.display = 'flex';
+                // 可选：存储登录状态（刷新页面不重复验证）
+                localStorage.setItem('isLogin', 'true');
+            } else {
+                // 密码错误：显示提示，清空输入框
+                errorTip.style.display = 'block';
+                passwordInput.value = '';
+                // 输入框聚焦
+                passwordInput.focus();
+            }
+        }
+
+        // 页面加载时检查登录状态
+        window.onload = function() {
+            const isLogin = localStorage.getItem('isLogin');
+            if (isLogin === 'true') {
+                // 已登录：直接显示内容
+                loginMask.style.display = 'none';
+                pageContainer.style.display = 'flex';
+            } else {
+                // 未登录：显示登录框，输入框聚焦
+                passwordInput.focus();
+            }
+        }
+
+        // 点击登录按钮触发验证
+        loginBtn.addEventListener('click', verifyPassword);
+
+        // 按回车键触发登录
+        passwordInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                verifyPassword();
+            }
+        });
+    </script>
+</body>
+</html>

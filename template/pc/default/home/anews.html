@@ -1,0 +1,227 @@
+{template "header.html"}
+<main class="bg-white">
+    <div class="w-full mx-auto">
+        <!-- 顶部大图区域 -->
+        <div class="relative w-full h-[300px] md:h-[500px] mb-8">
+            <!-- 顶部满屏图片 -->
+            <img src="{dr_get_file($cat.lanmudatu)}" 
+                 alt="顶部大图" 
+                 class="w-full h-full object-cover">
+            
+            <!-- 左侧带白边图片（覆盖50%在顶部图片上） -->
+<div class="absolute md:bottom-[-40%] left-4 md:left-44 w-1/3 md:w-1/5 z-10 hidden md:block">
+    <img src="{dr_get_file($cat.lanmuertu)}" 
+         alt="左侧图片" 
+         class="w-full md:h-[400px] border-8 border-gray-200 shadow-lg">
+</div>
+            
+            <!-- 右侧标题区域 -->
+            <div class="absolute -bottom-1/4 right-4 md:right-44 w-1/2 md:w-2/5 z-10 hidden md:block">
+                <h2 class="text-2xl md:text-4xl font-bold text-gray-900 mb-2 text-right sybold">{$cat.lmywm}</h2>
+                <p class="text-lg md:text-xl text-gray-700 text-right sybold">{$cat.name}</p>
+            </div>
+            
+        </div>
+        
+        <div class="mt-20 mb-20 max-w-7xl mx-auto text-center block md:hidden">
+    <h3 class="text-2xl font-bold text-gray-900 mb-2 sye">{$cat.lmywm}</h3>
+    <p class="text-2xl font-bold text-gray-900 mb-2 syc">{$cat.name}</p>
+    </div>
+
+<div class="space-y-6 max-w-7xl mx-auto mt-20 md:mt-60">
+    <!-- 富文本内容区域 -->
+    <div class="bg-gray-50 p-6">
+        <!-- 富文本内容示例 -->
+        <h2 class="text-2xl font-bold text-gray-900 mb-4 text-left">{$title}</h2>
+        <!-- 富文本容器（外层控制整体布局） -->
+<div class="rich-text-container">
+    <!-- 富文本内容区（核心展示区） -->
+    <div class="rich-text-content">
+        {$content}
+    </div>
+</div>
+
+<!-- 核心 CSS 样式（内联/外部样式表均可） -->
+<style>
+/* 外层容器：适配不同屏幕，限制最大宽度，居中展示 */
+.rich-text-container {
+    width: 100%;
+    max-width: 1200px; /* 可选：限制最大宽度，避免大屏过宽 */
+    margin: 0 auto;    /* 可选：居中展示 */
+    padding: 0 16px;   /* 可选：左右留白，避免贴边 */
+    box-sizing: border-box;
+}
+
+/* 富文本核心样式：强制自动换行，适配所有屏幕 */
+.rich-text-content {
+    /* 1. 核心：强制文本自动换行（解决长文本/英文不换行问题） */
+    word-wrap: break-word;    /* 兼容旧浏览器：长单词/URL 换行 */
+    word-break: break-all;    /* 强制换行：中文/英文/数字都适配 */
+    white-space: normal;      /* 恢复默认换行（覆盖富文本可能的 nowrap） */
+    
+    /* 2. 基础排版：提升可读性 */
+    line-height: 1.8;         /* 行高：增强阅读体验 */
+    font-size: 16px;          /* 基础字号 */
+    color: #333;              /* 文本颜色 */
+    
+    /* 3. 确保容器不溢出，自适应高度 */
+    width: 100%;
+    overflow-wrap: break-word; /* 现代浏览器：替代 word-wrap，更标准 */
+    box-sizing: border-box;
+}
+
+/* 4. 响应式适配：不同屏幕调整字号/行高（可选，优化体验） */
+@media (max-width: 768px) {
+    .rich-text-content {
+        font-size: 15px;      /* 移动端字号稍小 */
+        line-height: 1.7;     /* 移动端行高微调 */
+    }
+}
+@media (max-width: 480px) {
+    .rich-text-content {
+        font-size: 14px;      /* 小屏手机进一步微调 */
+        padding: 8px 0;       /* 小屏留白优化 */
+    }
+}
+
+/* 5. 富文本内嵌套元素的适配（关键：避免图片/表格溢出） */
+.rich-text-content * {
+    box-sizing: border-box;   /* 所有子元素继承盒模型 */
+    max-width: 100% !important; /* 强制所有元素（图片/表格/视频）不超出容器 */
+    height: auto !important;  /* 图片/视频自适应高度，避免变形 */
+}
+
+/* 针对富文本内的特殊元素优化 */
+.rich-text-content img {
+    display: block;           /* 图片独占一行，避免文字环绕错位 */
+    margin: 16px auto;        /* 图片居中，上下留白 */
+}
+.rich-text-content table {
+    width: 100%;              /* 表格宽度适配容器 */
+    border-collapse: collapse;/* 表格边框合并，避免错位 */
+}
+.rich-text-content td, 
+.rich-text-content th {
+    padding: 8px;
+    word-wrap: break-word;    /* 表格内文本换行 */
+}
+.rich-text-content p {
+    margin: 0 0 16px 0;       /* 段落间距，提升可读性 */
+}
+</style>
+    </div>
+</div>
+        
+        <!-- 底部Swiper区域 -->
+        <div class="mt-16 text-center">
+            <div class="mt-20 mb-20">
+                <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-light text-gray-800 tracking-wider sybold">
+                    Latest Products
+                </h2>
+                <p class="mt-2 text-[clamp(1rem,2vw,1.25rem)] text-gray-600 sybold">最新产品</p>
+    </div>
+    <!-- 黑色背景Swiper容器 -->
+    <div class="bg-primary text-white p-8 relative">
+        <!-- 左右箭头 -->
+        <button class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10" id="prevBtn">
+            <i class="fa fa-chevron-left"></i>
+        </button>
+        <button class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10" id="nextBtn">
+            <i class="fa fa-chevron-right"></i>
+        </button>
+        
+        <!-- Swiper内容 -->
+        <div class="flex space-x-7 overflow-x-auto py-4 scrollbar-hide" id="swiperContainer">
+            {module module=cp catid=11 num=10 order=displayorder,updatetime}
+            <!-- Swiper名片1 -->
+            <div class="min-w-[280px] text-gray-900 overflow-hidden flex-shrink-0 swiper-item">
+                <!-- 内容保持不变 -->
+                <div class="bg-white p-2 h-80 flex items-center justify-center">
+    <img src="{dr_get_file($t.thumb)}" 
+         alt="{$t.title}" 
+         class="max-w-full max-h-60 object-contain bg-white">
+</div>
+                <div class="p-4 justify-center items-center text-center">
+                    <h4 class="text-base font-bold mb-2 leading-tight text-white text-center">
+                        {$t.yingwenming}
+                    </h4>
+                    <h4 class="text-base font-bold mb-2 leading-tight text-white text-center">
+                        {$t.title}
+                    </h4>
+                    {if $t.price}
+                    <div class="text-center text-white/90 text-sm md:text-base font-semibold mb-2">￥{dr_price_value($t.price)}</div>
+                    {/if}
+                       <a href="{$t.url}" class="inline-block bg-white text-primary px-4 py-1.5 text-sm hover:bg-dark transition-colors duration-300">
+        查看更多>
+    </a>
+                </div>
+            </div>
+            {/module}
+            <!-- 继续添加其他名片 -->
+        </div>
+    </div>
+</div>
+<style>
+    .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+</style>
+<script>
+    // 获取元素
+    const swiperContainer = document.getElementById('swiperContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const items = document.querySelectorAll('.swiper-item');
+    
+    // 计算每次滚动距离（单个卡片宽度+间距）
+    const itemWidth = 280 + 28; // 280px宽度 + 7*4px间距（space-x-7对应28px）
+    
+    // 左箭头点击事件
+    prevBtn.addEventListener('click', () => {
+        swiperContainer.scrollBy({
+            left: -itemWidth,
+            behavior: 'smooth'
+        });
+    });
+    
+    // 右箭头点击事件
+    nextBtn.addEventListener('click', () => {
+        swiperContainer.scrollBy({
+            left: itemWidth,
+            behavior: 'smooth'
+        });
+    });
+    
+    // 自动播放功能
+    let autoPlayInterval;
+    function startAutoPlay() {
+        autoPlayInterval = setInterval(() => {
+            // 计算是否滚动到最后
+            const maxScrollLeft = swiperContainer.scrollWidth - swiperContainer.clientWidth;
+            if (swiperContainer.scrollLeft >= maxScrollLeft) {
+                swiperContainer.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                swiperContainer.scrollBy({ left: itemWidth, behavior: 'smooth' });
+            }
+        }, 3000); // 每3秒滚动一次
+    }
+    
+    // 鼠标悬停时暂停自动播放
+    swiperContainer.parentElement.addEventListener('mouseenter', () => {
+        clearInterval(autoPlayInterval);
+    });
+    
+    // 鼠标离开时恢复自动播放
+    swiperContainer.parentElement.addEventListener('mouseleave', startAutoPlay);
+    
+    // 初始化自动播放
+    startAutoPlay();
+</script>
+    </div>
+</main>
+
+{template "footer.html"}

@@ -1,0 +1,235 @@
+{template "header.html"}
+
+<style>
+.labmr10{ margin-right: 10px; }
+.labtxt{color: #999;}
+.dis{ display: none }
+.custom-header{ height: 30px; line-height: 30px; background: #2f353b; color: #fff; text-align: center; border-radius: 3px; margin-bottom: 3px;}
+.ms-container .ms-list{ height: 505px!important; }
+.ms-container{ width: 100%!important; }
+
+.CodeMirror-wrap{ border-radius: 6px; overflow: hidden; }
+</style>
+
+<link href="{THEME_PATH}assets/global/plugins/codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
+<link href="{THEME_PATH}assets/global/plugins/codemirror/theme/material.css" rel="stylesheet" type="text/css" />
+
+<script src="{THEME_PATH}assets/global/plugins/codemirror/lib/codemirror.js" type="text/javascript"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/javascript/javascript.js" type="text/javascript"></script>
+
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/xml/xml.js" type="text/javascript"></script>
+
+<!-- 因为HTML混合语言依赖Javascript、XML、CSS语言支持，所以都要引入 -->
+<script src="{THEME_PATH}assets/global/plugins/codemirror/addon/edit/matchbrackets.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/addon/selection/active-line.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/addon/selection/selection-pointer.js"></script>
+
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/xml/xml.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/javascript/javascript.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/css/css.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+
+
+<div class="row">
+
+<form class="form-horizontal" id="myform_1">
+    {dr_form_hidden()}
+
+    <div class="col-md-6 col-sm-6">
+
+
+
+        <div class="portlet light bordered myportlet ">
+            <div class="portlet-title tabbable-line">
+                <div class="caption">
+                    <span class="caption-subject font-blue-sharp">
+                        <i class="fa fa-cog"></i> 网站项目信息
+                    </span>
+                    <span class="caption-helper">
+                        智能调用字段
+                    </span>
+                    
+                </div>
+            </div>
+
+        <div class="portlet-body form">
+                <div class="form-body">
+
+
+
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" style="padding-top: 0px;">
+                            <a class="btn dark">字段</a>
+                            <a id='select-all' class="btn green" style="margin: 10px 0;">全选</a>
+                            <a id='deselect-all' class="btn grey">移除</a>
+                        </label>
+                        <div class="col-md-9">
+                                <select class="form-control" name="field[]" id="field" multiple="multiple" class="multi-select">
+                                    <option value="">请选择模块</option>
+<?php
+            foreach ($field as $t) {
+                if($t['fieldtype']!='Merge' && $t['fieldtype']!='Group'){
+                    echo '<option value="'.$t['fieldname'].'">'.$t['name'].'（'.$t['fieldname'].'）</option>';  
+                }
+            }
+?>
+
+
+
+                                </select>
+                        </div>
+                        <div style="padding-top: 0px;" class="col-md-2">
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-md-offset-2 col-md-9">
+                            <button type="button" id="1" class="btn green">生成标签</button>
+                            <a href="javascript:dr_help_labe(15);" class="btn default">查看手册</a>
+                            <a href="javascript:dr_help_labe(102);" class="btn default">字段输出</a>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        </div>
+    </div>
+
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet light bordered myportlet copyinput">
+
+            <div class="portlet-title tabbable-line">
+                <div class="caption">
+                    <i class="fa fa-cog"></i>
+                    <span class="caption-subject">生成</span>
+                </div>
+            </div>
+            <div class="portlet-body form form-horizontal">
+                <div class="form-body" id="listlab">
+
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <textarea id="labelling" class="form-control" rows="30" name="labelling" ></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+</form>
+
+</div>
+
+<link href="{THEME_PATH}assets/global/plugins/jquery-multi-select/css/multi-select.css" rel="stylesheet" type="text/css" />
+<script src="{THEME_PATH}assets/global/plugins/jquery-multi-select/js/jquery.multi-select.js" type="text/javascript"></script>
+
+<script>
+var mixedMode = {
+    name: "htmlmixed",
+    scriptTypes: [{
+            matches: /\/x-handlebars-template|\/x-mustache/i,
+            mode: null
+        },
+        {
+            matches: /(text|application)\/(x-)?vb(a|script)/i,
+            mode: "vbscript"
+        }
+    ]
+};
+var editor = CodeMirror.fromTextArea(document.getElementById("labelling"), {
+    mode: mixedMode,
+    selectionPointer: true,
+    lineNumbers: true,
+    lineWrapping: true, // 自动换行
+    styleActiveLine: true,
+    theme: 'material', // 使用monokai模版
+    matchBrackets: true
+});
+editor.setSize('auto','580px');
+
+
+
+
+</script>
+
+
+<script type="text/javascript">
+
+jQuery(document).ready(function() {
+    $('#field').multiSelect();
+});
+
+$('#select-all').click(function(){
+  $('#field').multiSelect('select_all');
+  return false;
+});
+$('#deselect-all').click(function(){
+  $('#field').multiSelect('deselect_all');
+  return false;
+});
+
+
+
+
+
+$(".form button").click(function() {
+    var id = $(this).attr('id');
+    var textarea = '#myform_' + id + ' #labelling';
+    var form = '#myform_' + id;
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: '{dr_url("labelling/siteinfo/labelling")}&id=' + id,
+        data: $(form).serialize(),
+        success: function(json) {
+            if (json.code == 1) {
+                //$(textarea).html(json.msg);
+$(textarea).empty();
+$(textarea).text(json.msg);
+editor.getDoc().setValue(json.msg);
+editor.refresh();
+            } else {
+                $(textarea).html(json.data);
+                dr_cmf_tips(0, json.msg);
+            }
+            return false;
+        },
+        error: function(HttpRequest, ajaxOptions, thrownError) {
+            dr_ajax_alert_error(HttpRequest, ajaxOptions, thrownError)
+        }
+    });
+
+    //console.log("click");
+});
+</script>
+<script type="text/javascript">
+    function dr_help_labe(id) {
+        if (is_oemcms == 1) {
+            dr_tips(1, '请联系开发商');
+            return;
+        }
+        layer.open({
+            type: 2,
+            title: '<i class="fa fa-question-circle"></i> 在线帮助',
+            shadeClose: true,
+            scrollbar: false,
+            shade: 0,
+            area: ['80%', '90%'],
+            content: 'https://www.xunruicms.com/index.php?s=doc&c=show&id='+id+'&is_phpcmf=cms'
+        });
+    }
+</script>
+{template "footer.html"}

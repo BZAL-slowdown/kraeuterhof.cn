@@ -1,0 +1,175 @@
+{template "header.html"}
+
+    <!-- Banner区域 -->
+<section class="relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] lg:h-[700px]">
+    <!-- 给Banner添加统一类名和显示/隐藏状态 -->
+    <?php $inlbt=dr_site_value('sylbt');?>
+    {php $mval = $inlbt;}
+    <?php $bannerIndex = 0; ?>
+    {loop $mval $v}
+<div class="banner-slide w-full h-full bg-cover bg-center flex items-end justify-start pl-6 sm:pl-10 md:pl-16 pb-6 sm:pb-10 md:pb-16 text-white<?php echo $bannerIndex === 0 ? ' active' : ''; ?>" style="background-image: url('{dr_get_file($v[1])}'); position: absolute; top: 0; left: 0; opacity: <?php echo $bannerIndex === 0 ? '1' : '0'; ?>; transition: opacity 0.5s ease;">
+</div>
+<?php $bannerIndex++; ?>
+{/loop}
+    <!-- 左右箭头（添加点击事件） -->
+    <button class="absolute top-1/2 -translate-y-1/2 left-3 sm:left-4 bg-white/70 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center cursor-pointer z-10 hover:bg-white/90 transition-colors duration-300" onclick="switchBanner(-1)">
+        <i class="fas fa-chevron-left text-green-700"></i>
+    </button>
+    <button class="absolute top-1/2 -translate-y-1/2 right-3 sm:right-4 bg-white/70 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center cursor-pointer z-10 hover:bg-white/90 transition-colors duration-300" onclick="switchBanner(1)">
+        <i class="fas fa-chevron-right text-green-700"></i>
+    </button>
+    
+    <!-- 底部dots（添加点击事件和索引） -->
+    <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white cursor-pointer transition-colors duration-300" onclick="switchToBanner(0)"></div>
+        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white/50 cursor-pointer transition-colors duration-300" onclick="switchToBanner(1)"></div>
+        <!-- 如需保留5个dots，其余3个添加 onclick="switchToBanner(2/3/4)"，后续添加对应Banner即可 -->
+        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white/50 cursor-pointer transition-colors duration-300" onclick="switchToBanner(2)"></div>
+        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white/50 cursor-pointer transition-colors duration-300" onclick="switchToBanner(3)"></div>
+        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white/50 cursor-pointer transition-colors duration-300" onclick="switchToBanner(4)"></div>
+    </div>
+</section>
+
+<!-- 切换逻辑脚本 -->
+<script>
+let currentBannerIndex = 0;
+const banners = document.querySelectorAll('.banner-slide');
+const dots = document.querySelectorAll('.absolute.bottom-4 div');
+// 如需添加更多Banner，修改此数组长度（与Banner数量一致）
+const totalBanners = banners.length; 
+
+// 箭头切换（1=下一张，-1=上一张）
+function switchBanner(direction) {
+    currentBannerIndex = (currentBannerIndex + direction + totalBanners) % totalBanners;
+    updateBannerDisplay();
+}
+
+// 圆点直接切换到指定Banner
+function switchToBanner(index) {
+    currentBannerIndex = index;
+    updateBannerDisplay();
+}
+
+// 更新Banner显示状态和圆点样式
+function updateBannerDisplay() {
+    banners.forEach((banner, idx) => {
+        banner.style.opacity = idx === currentBannerIndex ? '1' : '0';
+        banner.classList.toggle('active', idx === currentBannerIndex);
+    });
+    dots.forEach((dot, idx) => {
+        dot.style.backgroundColor = idx === currentBannerIndex ? 'white' : 'rgba(255,255,255,0.5)';
+    });
+}
+
+// 自动轮播（3秒切换一次）
+setInterval(() => switchBanner(1), 3000);
+</script>
+
+    <!-- 产品展示区域 -->
+    <section class="my-10">
+        <div class="container mx-auto px-4 pt-20">
+            <!--  section标题 -->
+            
+            <!-- 产品布局 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <!-- 主产品 -->
+                <?php $ins=dr_site_value('sytjcpfl');?>
+                {php $arr1 = array_slice($ins, 0, 1);}
+                {loop $arr1 $v}
+                <a href="{$v[2]}" target="_blank" ><div class="lg:col-span-2 bg-gray-50 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 h-full">
+                    <img src="{dr_get_file($v[1])}" 
+                         alt="" class="w-full h-full md:h-[512px] object-cover">
+                </div></a>
+                {/loop}
+                <!-- 侧边产品 -->
+                <div class="flex flex-col gap-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        {php $arr2 = array_slice($ins, 1, 1);}
+                {loop $arr2 $v}
+                        <a href="{$v[2]}" target="_blank" ><div class="bg-gray-50 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <img src="{dr_get_file($v[1])}" 
+                                 alt="{dr_cat_value('cp', $v, 'name')}" class="w-full h-48 md:h-[300px] object-cover">
+                        </div></a>
+                        {/loop}
+                        {php $arr1 = array_slice($ins, 2, 1);}
+                {loop $arr1 $v}
+                        <div class="bg-gray-50 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <img src="{dr_get_file($v[1])}" 
+                                 alt="{dr_cat_value('cp', $v, 'name')}" class="w-full h-48 md:h-[300px] object-cover">
+                        </div>
+                        {/loop}
+                    </div>
+                    {php $arr1 = array_slice($ins, 3, 1);}
+                {loop $arr1 $v}
+                    <div class="bg-gray-50 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                        <img src="{dr_get_file($v[1])}" 
+                             alt="{dr_cat_value('cp', $v, 'name')}" class="w-full h-48 object-cover">
+                    </div>
+                    {/loop}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 最新产品区域 -->
+    <section class="my-10 py-8">
+        <div class="container mx-auto px-4">
+            <!-- section标题 -->
+            <h2 class="text-center text-2xl md:text-4xl text-[#3d3d3d] mb-7 relative  pt-10 pb-10">
+                <span class="sye">Latest Products</span><br><br>
+                <span class="syc">最新产品</span>
+                <span class="block w-20 h-0.75 bg-accent mx-auto mt-2.5"></span>
+            </h2>
+            
+            <!-- Swiper滑块 -->
+            <div class="swiper new-products-swiper">
+                <div class="swiper-wrapper pb-8">
+                    {module module=cp catid=11 num=7 order=displayorder,updatetime}
+                    <!-- 产品卡片1 -->
+                    <div class="swiper-slide">
+                        <div class="overflow-hidden transition-shadow duration-300 hover-lift">
+                            <!-- 父容器添加 flex 居中属性，图片自适应居中 -->
+<div class="bg-white w-full h-48 md:h-[350px] flex items-center justify-center">
+    <img src="{dr_get_file($t.thumb)}" alt="{$t.title}" class="h-48 md:h-[250px] object-contain">
+</div>
+                            <div class="p-3.5">
+                                <div class="text-[#3d3d3d] text-sm md:text-lg mb-1 text-center sye">{$t.yingwenming}</div>
+                                <div class="text-[#3d3d3d] text-sm mb-3.5 text-center syc">{$t.title}</div>
+                                {if $t.price}
+                                <div class="text-center text-primary text-sm md:text-base font-semibold mb-2">￥{dr_price_value($t.price)}</div>
+                                {/if}
+                                <div class="text-center mt-4"> <!-- mt-4 可选，控制上下间距 -->
+    <a href="{$t.url}" class="inline-block bg-primary text-white px-4 py-1.5 text-sm hover:bg-dark transition-colors duration-300 syc">
+        查看更多>
+    </a>
+</div>
+                            </div>
+                        </div>
+                    </div>
+                    {/module}
+                </div>
+                
+                <!-- Swiper导航按钮 -->
+                <div class="swiper-button-next text-[#1c5231]"></div>
+                <div class="swiper-button-prev text-[#1c5231]"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 图片展示区域 -->
+    <section class="bg-primary pt-10">
+        <div class="container mx-auto">
+            <div class="text-center mb-14 mt-14">
+                <h3 class="text-2xl md:text-4xl text-white sye">Enjoy The Bounty Nature</h3>
+                <p class=" text-2xl md:text-4xl text-white syc">享受大自然的赐予</p>
+            </div>
+            
+            <div class="mx-auto pb-20"> 
+            {php $dibutupian = dr_site_value('dibutupian');}
+    <img src="{dr_get_file($dibutupian)}" alt="榴莲文化" class="w-full h-48 md:h-[700px] object-cover shadow-sm hover:shadow-md transition-shadow duration-300">
+</div>
+        </div>
+    </section>
+
+{template "footer.html"}

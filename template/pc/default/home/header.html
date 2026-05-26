@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title class="syc">{$meta_title}</title>
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+        <!-- 系统懒人版js(所有自建模板引用) -->
+    <script type="text/javascript">var is_mobile_cms = '{IS_MOBILE}';var web_dir = '{WEB_DIR}';</script>
+    <script src="{LANG_PATH}lang.js" type="text/javascript"></script>
+    <script src="{THEME_PATH}assets/global/plugins/jquery.min.js" type="text/javascript"></script>
+    <script src="{THEME_PATH}assets/js/cms.js" type="text/javascript"></script>
+    <!-- 系统懒人版js结束 -->
+    <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1c5231',
+                        secondary: '#BEBEBE',
+                        light: '#f5f5f5',
+                        dark: '#222222',
+                        gray: {
+                            100: '#f3f4f6',
+                            200: '#e5e7eb',
+                            300: '#d1d5db',
+                            400: '#9ca3af',
+                            500: '#6b7280',
+                            600: '#4b5563',
+                            700: '#374151',
+                            800: '#1f2937',
+                            900: '#111827',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities { .content-auto { content-visibility: auto; } .text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.1); } .text-shadow-lg { text-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08); } .transition-transform { transition-property:
+        transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; } .hover-scale { @apply hover:scale-105 transition-all duration-300; } .card-hover { @apply hover:shadow-xl transition-all duration-300 hover:-translate-y-1;
+        } }
+    </style>
+        <style>
+        /* 声明OTF字体（请替换为你的字体路径和名称） */
+/* 逐个定义每个字体变体 */
+@font-face {
+    font-family: 'syhtCN-Regular';
+    src: url('fonts/syhtCN-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'SourceHanSerifCN-Regular';
+    src: url('fonts/SourceHanSerifCN-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 定义对应的类名，保持你原有的命名规则 */
+.syc {
+    font-family: 'syhtCN-Regular';
+}
+.sye {
+    font-family: 'SourceHanSerifCN-Regular';
+}
+    </style>
+</head>
+<body class="bg-white text-text-color font-sans leading-[1.6]">
+    <!-- 头部区域 -->
+<header class="sticky top-0 z-50 bg-white shadow-md">
+    <div class="container mx-auto px-4">
+        <!-- 导航栏 -->
+        <div class="flex justify-between items-center py-4 relative">
+            <!-- 左侧菜单按钮和文字LOGO（手机端隐藏文字） -->
+            <div class="flex items-center">
+                <!-- 面包式菜单打开按钮（保留，手机端显示） -->
+                <div class="cursor-pointer text-primary text-xl transition-transform duration-300 hover:translate-x-1.5 mr-3 md:hidden" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <!-- 左侧文字LOGO：md:block 平板/电脑显示，hidden 手机端隐藏 -->
+
+                <div class="syn md:block hidden text-xl md:text-2xl text-secondary flex items-center syc">
+    榴莲要吃三
+</div>
+                                 <div class="md:block hidden text-xl md:text-2xl text-secondary flex items-center syc">
+    <!-- 图标图片：ml-2 控制与文字的间距，可按需调整 -->
+    <img src="{THEME_PATH}/am/img/jt.png" alt="图标" class="ml-2 w-5 h-5 md:w-6 md:h-6 object-contain">
+</div>
+            </div>
+            
+            <!-- 中间LOGO图片（手机端也显示，保持不变） -->
+<div class="absolute left-1/2 top-1/4 -translate-y-1/2 md:-translate-x-1/2" style="transform: translateX(-90%);">
+    <img src="/uploadfile/202512/c35e2de6b2eae6a.png" alt="中间LOGO" class="h-10 md:h-12 object-contain">
+</div>
+            
+            <!-- 右侧搜索和购物车（添加手机端左侧间距，避开LOGO） -->
+            <div class="flex items-center md:ml-0 ml-8">
+                <!-- 搜索框：手机端缩小宽度，避免拥挤 -->
+                <div class="flex items-center bg-gray-100 rounded-full px-3 py-2 mr-2 md:px-3.5 md:py-2 md:mr-3.5">
+                    <i class="fas fa-search text-secondary mr-2"></i>
+                    <input type="text" placeholder="search" class="bg-transparent border-none outline-none w-16 md:w-24 lg:w-30 sye">
+                </div>
+                <a href="{SITE_URL}index.php?s=member&app=shop&c=center&m=index" class="hidden md:inline-flex items-center text-secondary hover:text-primary text-sm mr-3 syc">
+                    <i class="fas fa-user mr-1"></i>会员中心
+                </a>
+                <a href="{SITE_URL}index.php?s=shop&c=home&m=logout" class="hidden md:inline-flex items-center text-secondary hover:text-primary text-sm mr-3 syc">
+                    退出
+                </a>
+                <a href="{SITE_URL}index.php?s=member&app=shop&c=order&m=index" class="relative cursor-pointer text-secondary hover:text-primary text-xl" title="我的订单">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 主导航菜单 - 桌面端（保持不变） -->
+        <nav class="hidden md:flex items-center justify-center space-x-8 md:space-x-12 pt-4 pb-8 whitespace-nowrap border-t border-border-color">
+    <!-- 选中状态示例 - 添加 active 类 -->
+    <a href="{SITE_URL}" class="px-2 py-1 text-black hover:text-primary transition-colors active syc">首页</a>
+    <a href="{dr_share_cat_value(13,'url')}" class="px-2 py-1 text-gray-700 hover:text-primary transition-colors syc">{dr_share_cat_value(13,'name')}</a>
+    <!-- 产品系列下拉菜单 -->
+    <div class="relative group">
+        <a href="{dr_share_cat_value(11,'url')}" class="px-2 py-1 text-gray-700 hover:text-primary transition-colors flex items-center syc">
+            {dr_share_cat_value(11,'name')}
+            <i class="fas fa-chevron-down text-xs ml-1 transition-transform duration-300 group-hover:rotate-180"></i>
+        </a>
+        <div class="absolute left-0 mt-1 w-48 bg-white shadow-lg rounded-md overflow-hidden z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top scale-95 group-hover:scale-100">
+            {category module=share pid=11 num=10 order=displayorder_ac}
+            <a href="{$t.url}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary syc">{$t.name}</a>
+            {/category}
+            
+        </div>
+    </div>
+    <a href="{dr_share_cat_value(14,'url')}" class="px-2 py-1 text-gray-700 hover:text-primary transition-colors syc">{dr_share_cat_value(14,'name')}</a>
+    <a href="{dr_share_cat_value(15,'url')}" class="px-2 py-1 text-gray-700 hover:text-primary transition-colors syc">{dr_share_cat_value(15,'name')}</a>
+    <a href="{dr_share_cat_value(16,'url')}" class="px-2 py-1 text-gray-700 hover:text-primary transition-colors syc">{dr_share_cat_value(16,'name')}</a>
+    <a href="{dr_share_cat_value(17,'url')}" class="px-2 py-1 text-gray-700 hover:text-primary transition-colors syc">{dr_share_cat_value(17,'name')}</a>
+    <a href="{dr_share_cat_value(18,'url')}" class="px-2 py-1 text-gray-700 hover:text-primary transition-colors syc">{dr_share_cat_value(18,'name')}</a>
+</nav>
+
+<!-- 如需添加基础样式支持（确保 colors 变量可用），可添加以下 CSS -->
+<style>
+    :root {
+        --color-black: #000000;
+        --color-gray-700: #404040; /* 70% 黑色 */
+        --color-primary: #165DFF; /* 示例主色调，可根据实际需求修改 */
+        --border-color: #E5E7EB; /* 示例边框色，可根据实际需求修改 */
+    }
+    
+    .text-black {
+        color: var(--color-black);
+    }
+    
+    .text-gray-700 {
+        color: var(--color-gray-700);
+    }
+    
+    .border-border-color {
+        border-color: var(--border-color);
+    }
+    
+    /* 可选：为 active 状态添加下划线标识 */
+    .nav-link.active {
+        position: relative;
+    }
+    
+    .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: var(--color-primary);
+        border-radius: 1px;
+    }
+</style>
+        
+        <!-- 移动端菜单（保持不变，手机端显示） -->
+        <div class="md:hidden hidden border-t border-border-color" id="mobileMenu">
+            <div class="flex flex-col py-2">
+                <a href="{SITE_URL}" class="px-2 py-2 hover:bg-gray-50 syc">首页</a>
+                <a href="{SITE_URL}index.php?s=member&app=shop&c=center&m=index" class="px-2 py-2 hover:bg-gray-50 syc">会员中心</a>
+                <a href="{SITE_URL}index.php?s=member&app=shop&c=order&m=index" class="px-2 py-2 hover:bg-gray-50 syc">我的订单</a>
+                <a href="{SITE_URL}index.php?s=shop&c=home&m=logout" class="px-2 py-2 hover:bg-gray-50 syc">退出登录</a>
+                <a href="{dr_share_cat_value(13,'url')}" class="px-2 py-2 hover:bg-gray-50 syc">{dr_share_cat_value(13,'name')}</a>
+                <!-- 移动端产品系列下拉菜单 -->
+                <div>
+                    <div class="flex justify-between items-center px-2 py-2 hover:bg-gray-50 cursor-pointer mobileSubmenuToggle syc">
+                        <span>{dr_share_cat_value(11,'name')}</span>
+                        <i class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
+                    </div>
+                    <div class="pl-4 border-l-2 border-gray-200 hidden mobileSubmenu overflow-hidden transition-all duration-300 max-h-0">
+                        {category module=share pid=11 num=10 order=displayorder_asc}
+                        <a href="{$t.url}" class="block px-2 py-2 hover:bg-gray-50 syc">{$t.name}</a>
+                        {/category}
+                    </div>
+                </div>
+                <a href="{dr_share_cat_value(14,'url')}" class="px-2 py-2 hover:bg-gray-50 syc">{dr_share_cat_value(14,'name')}</a>
+                <a href="{dr_share_cat_value(15,'url')}" class="px-2 py-2 hover:bg-gray-50 syc">{dr_share_cat_value(15,'name')}</a>
+                <a href="{dr_share_cat_value(16,'url')}" class="px-2 py-2 hover:bg-gray-50 syc">{dr_share_cat_value(16,'name')}</a>
+                <a href="{dr_share_cat_value(17,'url')}" class="px-2 py-2 hover:bg-gray-50 syc">{dr_share_cat_value(17,'name')}</a>
+                <a href="{dr_share_cat_value(18,'url')}" class="px-2 py-2 hover:bg-gray-50 syc">{dr_share_cat_value(18,'name')}</a>
+            </div>
+        </div>
+    </div>
+</header>
+<script>
+// 菜单切换功能
+document.getElementById('menuToggle').addEventListener('click', function() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenu.classList.toggle('hidden');
+    // 修复滚动条问题：切换菜单时调整body样式
+    document.body.style.overflow = mobileMenu.classList.contains('hidden') ? '' : 'hidden';
+});
+
+// 移动端子菜单切换 - 使用max-height实现平滑过渡
+document.querySelectorAll('.mobileSubmenuToggle').forEach(toggle => {
+    toggle.addEventListener('click', function() {
+        const submenu = this.nextElementSibling;
+        const arrow = this.querySelector('i');
+        
+        // 切换箭头方向
+        arrow.classList.toggle('rotate-180');
+        
+        // 实现平滑展开/收起效果
+        if (submenu.classList.contains('hidden')) {
+            submenu.classList.remove('hidden');
+            // 强制回流后设置max-height以触发过渡
+            setTimeout(() => {
+                submenu.style.maxHeight = submenu.scrollHeight + 'px';
+            }, 10);
+        } else {
+            submenu.style.maxHeight = '0';
+            // 过渡结束后隐藏
+            submenu.addEventListener('transitionend', function handler() {
+                submenu.classList.add('hidden');
+                submenu.style.maxHeight = '';
+                submenu.removeEventListener('transitionend', handler);
+            }, { once: true });
+        }
+    });
+});
+
+// 页面加载完成后检查并修复滚动条
+window.addEventListener('load', function() {
+    // 移除可能导致滚动条的额外空间
+    document.body.style.margin = 0;
+    document.documentElement.style.overflowX = 'hidden';
+});
+</script>

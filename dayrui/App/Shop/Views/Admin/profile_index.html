@@ -1,0 +1,65 @@
+{template "header.html"}
+<div class="page-content">
+  <div class="portlet light bordered">
+    <div class="portlet-title">
+      <div class="caption"><i class="fa fa-user"></i> 会员资料管理</div>
+    </div>
+    <div class="portlet-body">
+      <div class="margin-bottom-20">
+        <a href="{dr_url('shop/order/index')}" class="btn default"><i class="fa fa-list"></i> 订单管理</a>
+        <a href="{dr_url('shop/profile/index')}" class="btn green"><i class="fa fa-user"></i> 会员资料</a>
+        <a href="{dr_url('shop/payconfig/index')}" class="btn default"><i class="fa fa-credit-card"></i> 支付配置</a>
+        <a href="{dr_url('shop/antifake/index')}" class="btn default"><i class="fa fa-shield"></i> 防伪码导入</a>
+      </div>
+
+      <form method="get" class="form-inline margin-bottom-20">
+        <input type="hidden" name="s" value="shop">
+        <input type="hidden" name="c" value="profile">
+        <input type="hidden" name="m" value="index">
+        <input type="text" name="keyword" value="{$keyword}" class="form-control input-inline" style="width:280px" placeholder="UID / 昵称 / 手机号 / 收货人">
+        <button class="btn blue"><i class="fa fa-search"></i> 搜索</button>
+      </form>
+
+      <div class="alert alert-info">
+        这里展示的是 Shop 扩展的前台昵称、头像和默认收货资料；迅睿原登录账号仍由会员系统管理。
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+          <thead>
+            <tr>
+              <th style="width:80px">头像</th>
+              <th>UID</th>
+              <th>登录账号</th>
+              <th>展示名称</th>
+              <th>默认收货资料</th>
+              <th>更新时间</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loop $profiles $t}
+            <tr>
+              <td>{if $t.avatar}<img src="{$t.avatar}" style="width:46px;height:46px;border-radius:50%;object-fit:cover">{else}<span class="label label-default">无头像</span>{/if}</td>
+              <td>{$t.uid}</td>
+              <td>{if $t.member_username}{$t.member_username}{else}-{/if}</td>
+              <td>{$t.display_name}</td>
+              <td>
+                {if $t.address}
+                {$t.address.buyer_name} {$t.address.buyer_phone}<br>{$t.address.buyer_address}
+                {else}
+                <span class="font-grey-silver">未填写</span>
+                {/if}
+              </td>
+              <td>{if $t.updated_at}{dr_date($t.updated_at, 'Y-m-d H:i')}{else}-{/if}</td>
+            </tr>
+            {/loop}
+          </tbody>
+        </table>
+      </div>
+      {if !$profiles}
+      <div class="alert alert-warning">暂无自定义会员资料。用户在前台“个人资料”保存后会出现在这里。</div>
+      {/if}
+    </div>
+  </div>
+</div>
+{template "footer.html"}

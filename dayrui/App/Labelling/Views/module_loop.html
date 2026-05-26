@@ -1,0 +1,437 @@
+{template "header.html"}
+
+<style>
+.labmr10{ margin-right: 10px; }
+.labtxt{color: #999;}
+.dis,#page1,#page2,#page3,#sys,#sys_txt{ display: none }
+.CodeMirror-wrap{ border-radius: 6px; overflow: hidden; }
+</style>
+
+<link href="{THEME_PATH}assets/global/plugins/codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
+<link href="{THEME_PATH}assets/global/plugins/codemirror/theme/material.css" rel="stylesheet" type="text/css" />
+
+<script src="{THEME_PATH}assets/global/plugins/codemirror/lib/codemirror.js" type="text/javascript"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/javascript/javascript.js" type="text/javascript"></script>
+
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/xml/xml.js" type="text/javascript"></script>
+
+<!-- 因为HTML混合语言依赖Javascript、XML、CSS语言支持，所以都要引入 -->
+<script src="{THEME_PATH}assets/global/plugins/codemirror/addon/edit/matchbrackets.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/addon/selection/active-line.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/addon/selection/selection-pointer.js"></script>
+
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/xml/xml.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/javascript/javascript.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/css/css.js"></script>
+<script src="{THEME_PATH}assets/global/plugins/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+<div class="row">
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet light bordered myportlet ">
+            <div class="portlet-title tabbable-line">
+                <div class="caption">
+                    <i class="fa fa-cog"></i>
+                    <span class="caption-subject"> 栏目内容列表</span>
+                </div>
+            </div>
+
+        <div class="portlet-body form">
+            <form class="form-horizontal" id="myform_1">
+                {dr_form_hidden()}
+                <div class="form-body">
+
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">页面</label>
+                        <div class="col-md-10">
+                            <label class="labmr10">
+                                <select class="form-control" name="temp" id="temp">
+                                    <option value="1">category.html，list.html</option>
+                                    <option value="2">其他位置</option>
+                                </select>
+                            </label>
+                        
+
+
+                            <label>模块</label>
+                       
+                            <label class="labmr10">
+                                <select class="form-control" name="module" id="module" onchange="single_cat(this);">
+                                    <option value="0">默认</option>
+                                    {cache name=module-content}
+                                    <option value="{$t.dirname}">{$t.name}</option>
+                                    {/cache}
+                                </select>
+                            </label>
+
+                            <label id="flag_txt" class="dis">推荐位</label>
+                            <label class="labmr10 dis" id="flag_input">
+                                <select class="form-control" name="flag" id="flag">
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">栏目</label>
+                        <div class="col-md-10">
+                            <label class="labmr10">
+                                <select class="form-control" name="catid" id="catid" onchange="single_cat(this);">
+                                    <option value="0">默认</option>
+                                    <option value="10000">指定多个栏目</option>
+                                </select>
+                            </label>
+                            <label class="labmr10 dis" id="catid_input">
+                                <input class="form-control" type="text" name="catids" value="" placeholder="输入栏目id" />
+                            </label>
+                            <label class="labtxt dis" id="catid_txt" >
+                                多个栏目以小写分号分开
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">记录数</label>
+                        <div class="col-md-10">
+                            <label class="labmr10"><input class="form-control " type="text" name="num" value="10" style="width:80px;"/></label>
+                            <label>缓存时间</label>
+                            <label class="labmr10"><input class="form-control " type="text" name="cache" value="" placeholder="默认" style="width:80px;"/></label>
+                            <label>变量</label>
+                            <label class="labmr10"><input class="form-control " type="text" name="return" value="" placeholder="默认" style="width:80px;"/></label>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">分页</label>
+                        <div class="col-md-10">
+                            <label class="labmr10">
+                                <select class="form-control" name="page" id="page" onchange="single_cat(this);">
+                                    <option value="0">否</option>
+                                    <option value="1">是</option>
+                                </select>
+                            </label>
+
+                            <label class="labmr10" id="sys">
+                                <select class="form-control" name="sbpage" id="sbpage" onchange="single_cat(this);">
+                                    <option value="0">系统</option>
+                                    <option value="1">手动</option>
+                                </select>
+                            </label>
+
+
+
+
+                            <label id="page1">每页</label>
+                            <label id="page2"><input type="text" class="form-control" name="pagesize" value="10"  style="width:80px;"/></label>
+                            <label id="page3" class="labmr10">条</label>
+
+                            <label class="labtxt" id="sys_txt">“系统”则按后台栏目设定分页，“指定”则按“每页数量”分页</label>
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-md-offset-2 col-md-9">
+                            <button type="button" id="1" class="btn green">生成标签</button>
+                            <a href="javascript:dr_help_labe(15);" class="btn default">查看手册</a>
+                            <a href="javascript:dr_help_labe(102);" class="btn default">字段输出</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        </div>
+
+
+
+
+
+        <div class="portlet light bordered myportlet copyinput">
+
+            <div class="portlet-title tabbable-line">
+                <div class="caption">
+                    <i class="fa fa-cog"></i>
+                    <span class="caption-subject">循环调用代码</span>
+                </div>
+            </div>
+            <div class="portlet-body form form-horizontal">
+                <div class="form-body" id="listlab">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <textarea id="labelling" class="form-control" rows="30" name="labelling" ></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet light bordered myportlet copyinput">
+
+            <div class="portlet-title tabbable-line">
+                <div class="caption">
+                    <i class="fa fa-cog"></i>
+                    <span class="caption-subject">更多字段</span>
+                </div>
+            </div>
+            <div class="portlet-body form form-horizontal">
+                <div class="form-body" id="listlab">
+
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <textarea id="labelfiled" class="form-control" rows="30" name="labelfiled" ></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+
+</div>
+
+<script>
+var mixedMode = {
+    name: "htmlmixed",
+    scriptTypes: [{
+            matches: /\/x-handlebars-template|\/x-mustache/i,
+            mode: null
+        },
+        {
+            matches: /(text|application)\/(x-)?vb(a|script)/i,
+            mode: "vbscript"
+        }
+    ]
+};
+var editor1 = CodeMirror.fromTextArea(document.getElementById("labelling"), {
+    mode: mixedMode,
+    selectionPointer: true,
+    lineNumbers: true,
+    lineWrapping: true, // 自动换行
+    styleActiveLine: true,
+    theme: 'material', // 使用monokai模版
+    matchBrackets: true
+});
+editor1.setSize('auto','185px');
+
+var editor2 = CodeMirror.fromTextArea(document.getElementById("labelfiled"), {
+    mode: mixedMode,
+    selectionPointer: true,
+    lineNumbers: true,
+    lineWrapping: true, // 自动换行
+    styleActiveLine: true,
+    theme: 'material', // 使用monokai模版
+    matchBrackets: true
+});
+editor2.setSize('auto','595px');
+
+
+
+
+</script>
+
+
+<script>
+
+function single_cat(select){
+
+if(select.id=='page'){
+
+    if(select.value==1){
+        $('#sys').show();
+        $('#sys_txt').show();
+
+    }else{
+        $('#sys').hide();
+        $('#sys_txt').hide();
+    }
+
+}
+
+if(select.id=='sbpage'){
+
+    if(select.value==1){
+        $('#page1').show();
+        $('#page2').show();
+        $('#page3').show();
+    }else{
+        $('#page1').hide();
+        $('#page2').hide();
+        $('#page3').hide();
+    }
+
+}
+
+
+
+    if(select.id=='catid'){
+
+        if(select.value==10000){
+            $('#'+select.id+'_input').show();
+            $('#'+select.id+'_txt').show();
+        }else{
+            $('#'+select.id+'_input').hide();
+            $('#'+select.id+'_txt').hide();
+        }
+
+    }
+
+    if(select.id=='module'){
+        $('#catid').empty();
+        $('#flag').empty();
+        $('#flag_input').hide();
+        $('#flag_txt').hide();
+
+        if(select.value!=0){
+
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: '{dr_url("labelling/module/param")}',
+                data: {module: select.value, {csrf_token()}: "{csrf_hash()}"},
+
+                success: function(json) {
+                    if (json.code == 1 && json.msg) {
+                        $('#flag').append(json.msg);
+                        $('#flag_txt').show();
+                        $('#flag_input').show();
+                    } 
+                    return false;
+                },
+                error: function(HttpRequest, ajaxOptions, thrownError) {
+                    dr_ajax_alert_error(HttpRequest, ajaxOptions, thrownError)
+                }
+            });
+
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: '{dr_url("labelling/home/catstree")}',
+                data: {module: select.value, {csrf_token()}: "{csrf_hash()}"},
+
+                success: function(json) {
+                    if (json.code == 1) {
+                        $('#catid').append(json.msg+'<optgroup label="手动填栏目ID"><option value="10000">指定多个栏目</option></optgroup>');
+                    } else {
+                        dr_cmf_tips(0, json.msg);
+                    }
+                    return false;
+                },
+                error: function(HttpRequest, ajaxOptions, thrownError) {
+                    dr_ajax_alert_error(HttpRequest, ajaxOptions, thrownError)
+                }
+            });
+
+            $('#catid_input').hide();
+            $('#catid_txt').hide();
+
+
+        }else{
+
+        $('#catid').append('<option value="0">默认</option><option value="10000">指定多个栏目</option>');
+    }
+}
+
+    /*else{
+
+        if(select.value==0){
+            $('#'+select.id+'_input').hide();
+            $('#'+select.id+'_txt').hide();
+        }else{
+            $('#'+select.id+'_input').show();
+            $('#'+select.id+'_txt').show();
+        }
+
+    }*/
+
+    console.log(select.id);
+    //alert(this.id);
+}
+
+
+
+
+$(".form button").click(function() {
+    var id = $(this).attr('id');
+    var textarea1 = '#labelling';
+    var textarea2 = '#labelfiled';
+    var form = '#myform_' + id;
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: '{dr_url("labelling/module/labelling")}&id=' + id,
+        data: $(form).serialize(),
+        success: function(json) {
+            if (json.code == 1) {
+
+$(textarea1).empty();
+$(textarea1).text(json.msg);
+editor1.getDoc().setValue(json.msg);
+editor1.refresh();
+
+$(textarea2).empty();
+$(textarea2).text(json.data);
+editor2.getDoc().setValue(json.data);
+editor2.refresh();
+
+            } else {
+
+$(textarea1).empty();
+$(textarea1).text(json.msg);
+editor1.getDoc().setValue(json.msg);
+editor1.refresh();
+dr_cmf_tips(0, json.msg);
+
+            }
+            return false;
+        },
+        error: function(HttpRequest, ajaxOptions, thrownError) {
+            dr_ajax_alert_error(HttpRequest, ajaxOptions, thrownError)
+        }
+    });
+
+    //console.log("click");
+});
+</script>
+<script type="text/javascript">
+    function dr_help_labe(id) {
+        if (is_oemcms == 1) {
+            dr_tips(1, '请联系开发商');
+            return;
+        }
+        layer.open({
+            type: 2,
+            title: '<i class="fa fa-question-circle"></i> 在线帮助',
+            shadeClose: true,
+            scrollbar: false,
+            shade: 0,
+            area: ['80%', '90%'],
+            content: 'https://www.xunruicms.com/index.php?s=doc&c=show&id='+id+'&is_phpcmf=cms'
+        });
+    }
+</script>
+{template "footer.html"}

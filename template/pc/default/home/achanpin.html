@@ -1,0 +1,629 @@
+{template "header.html"}
+<?php
+$shop_default_address = [];
+if (!empty($member['uid'])) {
+    $shop_model = \Phpcmf\Service::M();
+    $shop_address_table = $shop_model->dbprefix('shop_address');
+    if ($shop_model->is_table_exists($shop_address_table)) {
+        $shop_default_address = $shop_model->db->table($shop_address_table)
+            ->where('uid', (int)$member['uid'])
+            ->orderBy('is_default DESC,id DESC')
+            ->get()
+            ->getRowArray();
+    }
+}
+$shop_has_default_address = !empty($shop_default_address['buyer_name'])
+    && !empty($shop_default_address['buyer_phone'])
+    && !empty($shop_default_address['buyer_address']);
+$shop_member_uid = !empty($member['uid']) ? (int)$member['uid'] : 0;
+$shop_pay_config = [];
+$shop_pay_config_files = [];
+if (defined('FCPATH')) {
+    $shop_pay_config_files[] = FCPATH.'App/Shop/Config/Pay.php';
+}
+if (defined('WEBPATH')) {
+    $shop_pay_config_files[] = dirname(rtrim(WEBPATH, '/\\')).'/dayrui/App/Shop/Config/Pay.php';
+}
+if (!empty($_SERVER['DOCUMENT_ROOT'])) {
+    $shop_pay_config_files[] = dirname(rtrim($_SERVER['DOCUMENT_ROOT'], '/\\')).'/dayrui/App/Shop/Config/Pay.php';
+}
+foreach (array_unique($shop_pay_config_files) as $shop_pay_config_file) {
+    if ($shop_pay_config_file && is_file($shop_pay_config_file)) {
+        $shop_pay_config = require $shop_pay_config_file;
+        break;
+    }
+}
+$shop_wechat_config = !empty($shop_pay_config['wechat_h5']) && is_array($shop_pay_config['wechat_h5']) ? $shop_pay_config['wechat_h5'] : [];
+$shop_alipay_config = !empty($shop_pay_config['alipay_wap']) && is_array($shop_pay_config['alipay_wap']) ? $shop_pay_config['alipay_wap'] : [];
+$shop_alipay_private_key = $shop_alipay_config['app_private_key'] ?? ($shop_alipay_config['merchant_private_key'] ?? '');
+$shop_wechat_enabled = !empty($shop_wechat_config['enabled'])
+    && !empty($shop_wechat_config['appid'])
+    && !empty($shop_wechat_config['mchid'])
+    && !empty($shop_wechat_config['merchant_serial_no'])
+    && !empty($shop_wechat_config['api_v3_key'])
+    && !empty($shop_wechat_config['merchant_private_key'])
+    && is_file($shop_wechat_config['merchant_private_key'])
+    && !empty($shop_wechat_config['platform_public_key'])
+    && is_file($shop_wechat_config['platform_public_key']);
+$shop_alipay_enabled = !empty($shop_alipay_config['enabled'])
+    && !empty($shop_alipay_config['app_id'])
+    && !empty($shop_alipay_private_key)
+    && is_file($shop_alipay_private_key)
+    && !empty($shop_alipay_config['alipay_public_key'])
+    && is_file($shop_alipay_config['alipay_public_key']);
+?>
+<main class="bg-gray-100">
+    <div class="w-full mx-auto">
+        <!-- 顶部大图区域 -->
+        <div class="hidden md:block relative w-full h-[300px] md:h-[500px] mb-8">
+            <!-- 顶部满屏图片 -->
+            <img src="{dr_get_file($cat.lanmudatu)}" 
+                 alt="顶部大图" 
+                 class="w-full h-full object-cover">
+        </div>
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row">
+        <!-- 左侧信息区域 -->
+        <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col">
+          <!-- 标题区域 -->
+          <div class="mb-6">
+            <h1 class="text-[clamp(1.5rem,3vw,2.25rem)] font-bold mb-2 syc">
+              {$title}
+            </h1>
+            <p class="text-gray-dark text-lg sye">{$yingwenming}</p>
+            {if $price}
+            <div class="mt-4 inline-flex items-baseline gap-2 rounded-full bg-primary/5 px-4 py-2">
+              <span class="text-sm text-gray-500">售价</span>
+              <span class="text-2xl font-semibold text-primary">￥{dr_price_value($price)}</span>
+            </div>
+            {/if}
+          </div>
+          
+          <!-- 产品图片 -->
+          <div class="mb-6">
+            <img src="{THEME_PATH}/am/img/113.png" 
+                 alt="产品图片" 
+                 class="product-image w-full h-auto object-cover">
+          </div>
+          
+          <!-- 产品描述 -->
+          <div class="mb-6">
+            <p class="text-gray-700 leading-relaxed">
+              {$description}
+            </p>
+          </div>
+          
+          <!-- 净含量 -->
+          <div class="mb-8 pt-2 border-t border-gray-medium">
+  <div class="flex items-center gap-3">
+    <p class="text-lg font-medium">净含量：</p>
+    {loop $jinghanliang $v}
+    <button class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors">{$v[1]}</button>
+{/loop}
+  </div>
+</div>
+          
+          <!-- 三个功能按钮 -->
+          <div class="grid grid-cols-3 gap-4 mb-8">
+            <button class="flex flex-col items-center justify-center p-4 bg-gray-light rounded-lg btn-hover">
+              <i class="fa fa-truck text-primary text-xl mb-2"></i>
+              <span class="text-sm">包邮</span>
+            </button>
+            <button class="flex flex-col items-center justify-center p-4 bg-gray-light rounded-lg btn-hover">
+              <i class="fa fa-shield text-primary text-xl mb-2"></i>
+              <span class="text-sm">正品保障</span>
+            </button>
+            <button class="flex flex-col items-center justify-center p-4 bg-gray-light rounded-lg btn-hover">
+              <i class="fa fa-refresh text-primary text-xl mb-2"></i>
+              <span class="text-sm">7天退换</span>
+            </button>
+          </div>
+          
+          <!-- 数量选择器 -->
+          <form id="shopOrderForm" method="post" action="{SITE_URL}index.php?s=shop&c=home&m=create" class="space-y-4">
+          <input type="hidden" name="product_id" value="{$id}">
+          <input type="hidden" name="sku" id="shopSkuValue" value="">
+          <input type="hidden" name="pay_type" id="shopPayTypeValue" value="{if $shop_wechat_enabled}wechat_h5{elseif $shop_alipay_enabled}alipay_wap{/if}">
+          <div class="mb-8 flex items-center w-40">
+            <label for="quantity" class="mr-4 text-gray-700">数量：</label>
+            <div class="flex border border-gray-medium rounded-md overflow-hidden">
+              <button type="button" id="decrease" class="w-10 h-10 flex items-center justify-center bg-gray-light hover:bg-gray-medium transition-colors">
+                <i class="fa fa-minus"></i>
+              </button>
+              <input type="number" id="quantity" name="quantity" value="1" min="1" 
+                     class="w-12 h-10 text-center border-x border-gray-medium focus:outline-none">
+              <button type="button" id="increase" class="w-10 h-10 flex items-center justify-center bg-gray-light hover:bg-gray-medium transition-colors">
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 gap-3 mb-6">
+            {if $shop_has_default_address}
+            <div class="rounded-lg border border-green-100 bg-white p-4 text-sm text-gray-700">
+              <div class="mb-2 flex items-center justify-between gap-3">
+                <span class="font-semibold text-primary">默认收货信息</span>
+                <a class="text-primary hover:underline" href="{SITE_URL}index.php?s=member&app=shop&c=address&m=index">修改</a>
+              </div>
+              <div class="leading-7">
+                <div>收货人：{$shop_default_address.buyer_name}</div>
+                <div>手机号：{$shop_default_address.buyer_phone}</div>
+                <div>地址：{$shop_default_address.buyer_address}</div>
+              </div>
+            </div>
+            <input type="hidden" name="buyer_name" value="{$shop_default_address.buyer_name}">
+            <input type="hidden" name="buyer_phone" value="{$shop_default_address.buyer_phone}">
+            <input type="hidden" name="buyer_address" value="{$shop_default_address.buyer_address}">
+            {else}
+            <input type="text" name="buyer_name" placeholder="收货人" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-primary">
+            <input type="tel" name="buyer_phone" placeholder="手机号" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-primary">
+            <input type="text" name="buyer_address" placeholder="收货地址" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-primary">
+            {if $shop_member_uid}
+            <a class="text-sm text-primary hover:underline" href="{SITE_URL}index.php?s=member&app=shop&c=address&m=index">去会员中心完善收货资料</a>
+            {/if}
+            {/if}
+          </div>
+          <button type="submit" class="mt-auto bg-primary text-white py-4 px-6 rounded-lg text-lg font-medium btn-hover flex items-center justify-center w-full">
+            <i class="fa fa-shopping-cart mr-2"></i>
+            立即购买
+          </button>
+          </form>
+        </div>
+        
+        <!-- 右侧图片展示区 -->
+        <div class="w-full md:w-1/2 bg-gray-100 p-6 md:p-8 flex flex-col">
+          <!-- 主图片展示 -->
+          <div class="mb-6 flex-grow flex items-center justify-center">
+            <img id="mainImage" 
+                 src="{dr_get_file($thumb)}" 
+                 alt="产品主图" 
+                 class="product-image max-h-[400px] w-auto object-contain">
+          </div>
+          
+          <!-- 缩略图区域 -->
+          <div class="grid grid-cols-4 gap-3">
+              {loop $cptp $i $c}
+            <div class="{if $i==0}thumbnail-active rounded-md overflow-hidden cursor-pointer{else}border border-gray-medium rounded-md overflow-hidden cursor-pointer hover:border-primary transition-colors{/if}">
+              <img src="{dr_get_file($c.file)}" 
+                   alt="产品图片1" 
+                   class="w-full h-20 object-cover">
+            </div>
+            {/loop}
+          </div>
+        </div>
+      </div>
+        
+  <script>
+    // 数量增减功能
+    const quantityInput = document.getElementById('quantity');
+    const decreaseBtn = document.getElementById('decrease');
+    const increaseBtn = document.getElementById('increase');
+    
+    decreaseBtn.addEventListener('click', () => {
+      let currentValue = parseInt(quantityInput.value);
+      if (currentValue > 1) {
+        quantityInput.value = currentValue - 1;
+      }
+    });
+    
+    increaseBtn.addEventListener('click', () => {
+      let currentValue = parseInt(quantityInput.value);
+      quantityInput.value = currentValue + 1;
+    });
+    
+    // 图片切换功能
+    const thumbnails = document.querySelectorAll('.grid-cols-4 img');
+    const mainImage = document.getElementById('mainImage');
+    const thumbnailContainers = document.querySelectorAll('.grid-cols-4 > div');
+    
+    thumbnails.forEach((thumbnail, index) => {
+      thumbnail.addEventListener('click', () => {
+        // 更新主图
+        mainImage.src = thumbnail.src;
+        
+        // 更新缩略图选中状态
+        thumbnailContainers.forEach(container => {
+          container.classList.remove('thumbnail-active');
+          container.classList.add('border', 'border-gray-medium', 'hover:border-primary');
+        });
+        
+        thumbnailContainers[index].classList.add('thumbnail-active');
+        thumbnailContainers[index].classList.remove('border', 'border-gray-medium', 'hover:border-primary');
+      });
+    });
+
+    const shopPayTypeValue = document.getElementById('shopPayTypeValue');
+    const payTypeChoices = document.querySelectorAll('[data-shop-pay-type]');
+    payTypeChoices.forEach((choice) => {
+      choice.addEventListener('change', () => {
+        if (choice.checked && shopPayTypeValue) {
+          shopPayTypeValue.value = choice.value;
+        }
+      });
+    });
+  </script>
+    <!-- 最新产品区域 -->
+        <!-- 支付配送信息区域 -->
+    <div class=" max-w-7xl mx-auto bg-white rounded-xl shadow-soft p-6 md:p-8 flex flex-col md:flex-row gap-6 md:gap-10">
+      
+      <!-- 左侧：支付方式和配送信息 -->
+      <div class="flex-1">
+        <!-- 支付方式 -->
+        <div class="mb-8">
+          <div class="flex items-center mb-4">
+            <i class="fa fa-shopping-bag text-primary text-xl mr-3"></i>
+            <h3 class="text-lg font-semibold text-gray-800">支付方式</h3>
+          </div>
+          
+          <div class="flex flex-wrap gap-3">
+            {if $shop_wechat_enabled}
+            <label class="shop-pay-option flex cursor-pointer items-center px-4 py-2 border border-primary bg-primary/5 rounded-lg text-primary">
+              <input class="mr-2" type="radio" name="shop_pay_type_choice" value="wechat_h5" data-shop-pay-type checked>
+              <i class="fa fa-weixin text-green-500 mr-2"></i>
+              <span>微信 H5 支付</span>
+            </label>
+            {/if}
+            {if $shop_alipay_enabled}
+            <label class="shop-pay-option flex cursor-pointer items-center px-4 py-2 border border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-all duration-200">
+              <input class="mr-2" type="radio" name="shop_pay_type_choice" value="alipay_wap" data-shop-pay-type {if !$shop_wechat_enabled}checked{/if}>
+              <i class="fa fa-credit-card text-blue-500 mr-2"></i>
+              <span>支付宝支付</span>
+            </label>
+            {/if}
+            {if !$shop_wechat_enabled && !$shop_alipay_enabled}
+            <div class="rounded-lg border border-red-100 bg-red-50 px-4 py-2 text-red-600">暂无可用支付方式，请联系管理员配置。</div>
+            {/if}
+          </div>
+        </div>
+        
+        <!-- 配送信息 -->
+        <div>
+          <div class="flex items-center mb-4">
+            <i class="fa fa-truck text-primary text-xl mr-3"></i>
+            <h3 class="text-lg font-semibold text-gray-800">配送信息</h3>
+          </div>
+          
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="flex flex-col space-y-2">
+              <p class="text-gray-700">
+                <span class="font-medium">17:30前付款，11月5日送货上门，晚到必赔</span>
+              </p>
+              <p class="text-gray-700">
+                <span class="font-medium">运费：</span>免费运费
+              </p>
+              <div class="flex items-center mt-1">
+                <span class="text-gray-700 mr-2">发货地至目的地：</span>
+                <div class="flex items-center text-gray-600">
+                  <span>金华保税仓发货 至</span>
+                  <span class="mx-1">→</span>
+                  <span>广州市 荔湾区</span>
+                  <button class="ml-2 text-primary hover:underline text-sm">
+                    <i class="fa fa-chevron-down text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 右侧：联系方式与二维码 -->
+      <div class="w-full md:w-48 flex flex-col items-center md:items-end">
+        <div class="contact-container w-full md:w-auto">
+          <!-- 联系按钮 -->
+          <button id="contactBtn" class="flex items-center justify-center gap-2 bg-primary text-white px-5 py-3 rounded-lg w-full md:w-auto hover:bg-primary/90 transition-all duration-200 shadow-md hover:shadow-lg">
+            <i class="fa fa-phone"></i>
+            <span>联系方式</span>
+            <i id="arrowIcon" class="fa fa-chevron-down transition-transform duration-300"></i>
+          </button>
+          
+          <!-- 二维码区域（默认隐藏） -->
+          <div id="qrcodeContainer" class="mt-3 bg-white rounded-lg shadow-md p-3 overflow-hidden max-h-0 transition-height">
+            <div class="flex flex-col items-center">
+              <div class="w-36 h-36 bg-gray-100 rounded-md flex items-center justify-center mb-2">
+                <!-- 二维码图片 -->
+                <?php $kefuerweima=dr_site_value('kefuerweima');?>
+                <img src="{dr_get_file($kefuerweima)}" alt="联系二维码" class="w-full h-full object-cover">
+              </div>
+              <p class="text-xs text-gray-500 text-center">扫码联系客服</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+      <script>
+    // 联系方式按钮交互
+    const contactBtn = document.getElementById('contactBtn');
+    const qrcodeContainer = document.getElementById('qrcodeContainer');
+    const arrowIcon = document.getElementById('arrowIcon');
+    let isExpanded = false;
+    
+    contactBtn.addEventListener('click', () => {
+      isExpanded = !isExpanded;
+      
+      if (isExpanded) {
+        // 展开二维码
+        qrcodeContainer.style.maxHeight = '200px';
+        arrowIcon.style.transform = 'rotate(180deg)';
+      } else {
+        // 收起二维码
+        qrcodeContainer.style.maxHeight = '0';
+        arrowIcon.style.transform = 'rotate(0)';
+      }
+    });
+  </script>
+    <section class=" max-w-7xl mx-auto">
+        <div class="container mx-auto px-4">
+            <!-- section标题 -->
+            <h2 class="hidden text-2xl md:text-4xl text-[#3d3d3d] mb-7 relative  pt-10 pb-10">
+                <div class="sye">Latest Products</div><br><br>
+                <div class="syc">最新产品</div>
+                <span class="block w-20 h-0.75 bg-accent mx-auto mt-2.5"></span>
+            </h2>
+            
+            <!-- Swiper滑块 -->
+            <div class="swiper new-products-swiper mt-4">
+                <div class="swiper-wrapper pb-8">
+                    {module module=cp catid=$cat.id num=10 order=displayorder,updatetime}
+                    <!-- 产品卡片1 -->
+                    <div class="swiper-slide">
+                        <div class="overflow-hidden transition-shadow duration-300 hover-lift">
+                            <!-- 父容器添加 flex 居中属性，图片自适应居中 -->
+<div class="bg-white w-full h-56 md:h-[350px] flex items-center justify-center">
+    <img src="{dr_get_file($t.thumb)}" alt="金枕榴莲" class="h-48 md:h-[250px] object-contain">
+</div>
+                            <div class="p-3.5">
+                                <div class="text-[#3d3d3d] text-sm md:text-lg mb-1 text-center sye">{$t.yingwenming}</div>
+                                <div class="text-[#3d3d3d] text-sm mb-3.5 text-center syc">{$t.title}</div>
+                                <div class="text-center mt-4"> <!-- mt-4 可选，控制上下间距 -->
+    <a href="{$t.url}" class="inline-block bg-primary text-white px-4 py-1.5 text-sm hover:bg-dark transition-colors duration-300">
+        查看更多>
+    </a>
+</div>
+                            </div>
+                        </div>
+                    </div>
+                    {/module}
+                </div>
+                
+                <!-- Swiper导航按钮 -->
+                <div class="swiper-button-next text-primary top-24 md:top-44"></div>
+                <div class="swiper-button-prev text-primary top-24 md:top-44"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+    <section class="max-w-7xl mx-auto py-8 px-4 md:px-8">
+  <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold mb-6 pb-2 border-b border-gray-200">产品评价</h2>
+  
+  <!-- 评论列表容器 -->
+  <div id="comments-container" class="space-y-8">
+      {php $arr1 = array_slice($pingjia, 0, 2);}
+      {loop $arr1 $v}
+    <!-- 评论1 - 初始显示 -->
+    <div class="comment-item bg-white rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
+      <div class="flex items-start">
+        <div class="flex-shrink-0 mr-4">
+          <img src="{dr_get_file($v[1])}" alt="用户头像" class="w-12 h-12 rounded-full object-cover border-2 border-blue-200">
+        </div>
+        <div class="flex-1">
+          <h3 class="font-semibold text-lg mb-1">{$v[2]}</h3>
+          <div class="flex items-center text-gray-500 text-sm mb-3">
+            <span class="mr-4"><i class="fa fa-clock-o mr-1"></i>{$v[3]}</span>
+          </div>
+          <div class="prose prose-sm max-w-none">
+            <p>{$v[4]}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {/loop}
+    
+    <!-- 隐藏的评论 - 初始不显示 -->
+    <div id="hidden-comments" class="space-y-8 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+      {php $arr2 = array_slice($pingjia, 2, 10);}
+      {loop $arr2 $v}
+    <!-- 评论1 - 初始显示 -->
+    <div class="comment-item bg-white rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
+      <div class="flex items-start">
+        <div class="flex-shrink-0 mr-4">
+          <img src="{dr_get_file($v[1])}" alt="用户头像" class="w-12 h-12 rounded-full object-cover border-2 border-blue-200">
+        </div>
+        <div class="flex-1">
+          <h3 class="font-semibold text-lg mb-1">{$v[2]}</h3>
+          <div class="flex items-center text-gray-500 text-sm mb-3">
+            <span class="mr-4"><i class="fa fa-clock-o mr-1"></i>{$v[3]}</span>
+          </div>
+          <div class="prose prose-sm max-w-none">
+            <p>{$v[4]}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {/loop}
+    </div>
+    
+    <!-- 查看更多按钮 -->
+    <div class="text-center pt-4">
+      <button id="toggle-comments" class="px-6 py-2 bg-primary text-white rounded-full hover:bg-blue-700 transition-colors duration-300 flex items-center mx-auto">
+        <span id="btn-text">查看更多</span>
+        <i id="btn-icon" class="fa fa-chevron-down ml-2"></i>
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+// 等待DOM加载完成
+document.addEventListener('DOMContentLoaded', function() {
+  const toggleBtn = document.getElementById('toggle-comments');
+  const hiddenComments = document.getElementById('hidden-comments');
+  const btnText = document.getElementById('btn-text');
+  const btnIcon = document.getElementById('btn-icon');
+  let isExpanded = false;
+  let hiddenHeight = 0;
+  
+  // 计算隐藏评论的真实高度（先临时显示再测量）
+  function calculateHiddenHeight() {
+    // 临时显示元素以获取真实高度
+    hiddenComments.style.maxHeight = 'none';
+    hiddenComments.style.overflow = 'visible';
+    const height = hiddenComments.offsetHeight;
+    
+    // 恢复初始状态
+    hiddenComments.style.maxHeight = '0';
+    hiddenComments.style.overflow = 'hidden';
+    
+    return height;
+  }
+  
+  // 初始化计算高度
+  hiddenHeight = calculateHiddenHeight();
+  
+  // 点击事件处理
+  toggleBtn.addEventListener('click', function() {
+    if (isExpanded) {
+      // 折叠评论
+      hiddenComments.style.maxHeight = '0';
+      btnText.textContent = '查看更多';
+      btnIcon.classList.remove('fa-chevron-up');
+      btnIcon.classList.add('fa-chevron-down');
+    } else {
+      // 展开评论
+      hiddenComments.style.maxHeight = hiddenHeight + 'px';
+      btnText.textContent = '收起';
+      btnIcon.classList.remove('fa-chevron-down');
+      btnIcon.classList.add('fa-chevron-up');
+    }
+    
+    // 切换状态
+    isExpanded = !isExpanded;
+  });
+});
+</script>
+            <!-- 产品参数区域 -->
+    <section class="max-w-7xl mx-auto py-8 px-4 md:px-8 bg-neutral/50">
+      <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold mb-6 pb-2 border-b border-gray-200">产品参数</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-5 rounded-lg shadow-sm">
+          <h3 class="font-semibold text-lg mb-4 text-primary">基本信息</h3>
+          <ul class="space-y-3">
+              {loop $cpcs $v}
+            <li class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-secondary">{$v[1]}</span>
+              <span>{$v[2]}</span>
+            </li>
+            {/loop}
+          </ul>
+        </div>
+        
+        <div class="bg-white p-5 rounded-lg shadow-sm">
+          <h3 class="font-semibold text-lg mb-4 text-primary">其他</h3>
+          <ul class="space-y-3">
+              {loop $cpcsqt $v}
+            <li class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-secondary">{$v[1]}</span>
+              <span>{$v[2]}</span>
+            </li>
+            {/loop}
+          </ul>
+        </div>
+      </div>
+    </section>
+    
+    <section class="max-w-7xl mx-auto py-8 px-4 md:px-8 bg-neutral/50">
+      <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold mb-6 pb-2 border-b border-gray-200">产品详情</h2>
+      
+      <div class="rich-text-container">
+    <!-- 富文本内容区（核心展示区） -->
+    <div class="rich-text-content">
+        {$content}
+    </div>
+</div>
+
+<!-- 核心 CSS 样式（内联/外部样式表均可） -->
+<style>
+/* 外层容器：适配不同屏幕，限制最大宽度，居中展示 */
+.rich-text-container {
+    width: 100%;
+    max-width: 1200px; /* 可选：限制最大宽度，避免大屏过宽 */
+    margin: 0 auto;    /* 可选：居中展示 */
+    padding: 0 16px;   /* 可选：左右留白，避免贴边 */
+    box-sizing: border-box;
+}
+
+/* 富文本核心样式：强制自动换行，适配所有屏幕 */
+.rich-text-content {
+    /* 1. 核心：强制文本自动换行（解决长文本/英文不换行问题） */
+    word-wrap: break-word;    /* 兼容旧浏览器：长单词/URL 换行 */
+    word-break: break-all;    /* 强制换行：中文/英文/数字都适配 */
+    white-space: normal;      /* 恢复默认换行（覆盖富文本可能的 nowrap） */
+    
+    /* 2. 基础排版：提升可读性 */
+    line-height: 1.8;         /* 行高：增强阅读体验 */
+    font-size: 16px;          /* 基础字号 */
+    color: #333;              /* 文本颜色 */
+    
+    /* 3. 确保容器不溢出，自适应高度 */
+    width: 100%;
+    overflow-wrap: break-word; /* 现代浏览器：替代 word-wrap，更标准 */
+    box-sizing: border-box;
+}
+
+/* 4. 响应式适配：不同屏幕调整字号/行高（可选，优化体验） */
+@media (max-width: 768px) {
+    .rich-text-content {
+        font-size: 15px;      /* 移动端字号稍小 */
+        line-height: 1.7;     /* 移动端行高微调 */
+    }
+}
+@media (max-width: 480px) {
+    .rich-text-content {
+        font-size: 14px;      /* 小屏手机进一步微调 */
+        padding: 8px 0;       /* 小屏留白优化 */
+    }
+}
+
+/* 5. 富文本内嵌套元素的适配（关键：避免图片/表格溢出） */
+.rich-text-content * {
+    box-sizing: border-box;   /* 所有子元素继承盒模型 */
+    max-width: 100% !important; /* 强制所有元素（图片/表格/视频）不超出容器 */
+    height: auto !important;  /* 图片/视频自适应高度，避免变形 */
+}
+
+/* 针对富文本内的特殊元素优化 */
+.rich-text-content img {
+    display: block;           /* 图片独占一行，避免文字环绕错位 */
+    margin: 0px auto;        /* 图片居中，上下留白 */
+}
+.rich-text-content table {
+    width: 100%;              /* 表格宽度适配容器 */
+    border-collapse: collapse;/* 表格边框合并，避免错位 */
+}
+.rich-text-content td, 
+.rich-text-content th {
+    padding: 8px;
+    word-wrap: break-word;    /* 表格内文本换行 */
+}
+.rich-text-content p {
+    margin: 0 0 16px 0;       /* 段落间距，提升可读性 */
+}
+</style>
+    </section>
+    <section class="bg-primary pt-10">
+        <div class="container mx-auto">
+            <div class="text-center mb-14 mt-14">
+                <h3 class="text-2xl md:text-4xl text-white sye">Enjoy The Bounty Nature</h3>
+                <p class=" text-2xl md:text-4xl text-white syc">享受大自然的赐予</p>
+            </div>
+            
+            <div class="mx-auto pb-20">
+                 {php $dibutupian = dr_site_value('dibutupian');}
+    <img src="{dr_get_file($dibutupian)}" alt="榴莲文化" class="w-full h-48 md:h-[700px] object-cover shadow-sm hover:shadow-md transition-shadow duration-300">
+</div>
+        </div>
+    </section>
+    </div>
+</main>
+
+{template "footer.html"}

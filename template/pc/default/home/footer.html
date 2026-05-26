@@ -1,0 +1,135 @@
+    <!-- 底部区域 -->
+    <footer class="bg-[#212121] text-gray-300 py-10">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto pb-20"> 
+    <img src="{THEME_PATH}/am/img/b-logo.png" alt="榴莲文化" class="w-full h-16 md:h-16 lg:h-16 object-contain transition-shadow duration-300">
+</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7 mb-7">
+                
+                <!-- 购物服务 -->
+                <div>
+                    <h4 class="text-white text-lg mb-3.5 relative pb-2 syc">
+                        购物服务
+                        <span class="absolute left-0 bottom-0 w-7.5 h-0.5 bg-accent"></span>
+                    </h4>
+                    <ul class="space-y-2.5">
+                        {category module=share pid=20 num=10 order=displayorder}
+                        <li><a href="{$t.url}" class="text-gray-400 hover:text-accent transition-colors duration-300 syc">{$t.name}</a></li>
+                        {/category}
+                    </ul>
+                </div>
+                
+                <!-- 品牌相关 -->
+                <div>
+                    <h4 class="text-white text-lg mb-3.5 relative pb-2 syc">
+                        品牌相关
+                        <span class="absolute left-0 bottom-0 w-7.5 h-0.5 bg-accent"></span>
+                    </h4>
+                    <ul class="space-y-2.5">
+                        {category module=share pid=22 num=10 order=displayorder}
+                        <li><a href="{$t.url}" class="text-gray-400 hover:text-accent transition-colors duration-300">{$t.name}</a></li>
+                        {/category}
+                    </ul>
+                </div>
+                                <!-- 品牌相关 -->
+                <div>
+                    <h4 class="text-white text-lg mb-3.5 relative pb-2 syc">
+                        关注七叶庄园<span class="sye">KRXUTERHOF</span>
+                        <span class="absolute left-0 bottom-0 w-7.5 h-0.5 bg-accent"></span>
+                    </h4>
+                    <ul class="space-y-2.5">
+                        {category module=share pid=24 num=10 order=displayorder}
+                        <li><a href="{$t.url}" class="text-gray-400 hover:text-accent transition-colors duration-300 syc">{$t.name}</a></li>
+                        {/category}
+                    </ul>
+                </div>
+                
+                <!-- 关注我们 -->
+                <div>
+                    <h4 class="text-white text-lg mb-3.5 relative pb-2 syc">
+                        企业信息
+                        <span class="absolute left-0 bottom-0 w-7.5 h-0.5 bg-accent"></span>
+                    </h4>
+                    <?php $dizhi=dr_site_value('dizhi');?>
+                    <div class="text-gray-400 text-sm mb-3.5 syc">
+                        公司地址：{$dizhi}
+                    </div>
+                    <div class="flex">
+                        {php extract(dr_get_form_post_value('dibudingyue'))}
+                        <form action="{$post_url}&is_show_msg=1" class="form-horizontal" method="post" name="myform" id="myform">
+                        <input type="email" name="data[title]" id="dr_title" placeholder="输入邮箱获取最新资讯" class="flex-1 px-3 py-2 border-none rounded-l-md outline-none text-gray-800 syc">
+                        <button type="submit" class="bg-accent text-white px-4 py-2 rounded-r-md hover:bg-primary transition-colors duration-300 hover-scale syc">
+                            订阅
+                        </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部版权信息 -->
+            <div class="border-t border-[#393939] flex flex-col md:flex-row justify-between items-center gap-3.5 mt-10">
+                <div class="flex gap-5 mt-10">
+                    {category module=share pid=25 num=10 order=displayorder}
+                    <a href="{$t.url}" class="text-gray-400 hover:text-accent transition-colors duration-300 text-center syc">{$t.name}</a>
+                    {/category}
+                </div>
+                <div class="flex items-center gap-2.5 text-gray-400 text-sm mt-10 syc">
+                    <img src="{THEME_PATH}/am/img/guo.png" class="w-8 h-8">
+                    <span><a href="https://zzapp.gsxt.gov.cn/#/checklicense" target="_blank" class="text-gray-400 hover:text-accent transition-colors duration-300 syc">广州艺妍轩信息科技有限公司</a></span>
+                    <img src="{THEME_PATH}/am/img/guo1.png" class="w-8 h-8">
+                    <span><a href="https://beian.miit.gov.cn/" target="_blank" class="text-gray-400 hover:text-accent transition-colors duration-300 syc">粤ICP备2022040723号-3</a></span>
+                </div>
+                <div class="flex gap-5 text-sm mt-10">
+                    <a href="#" class="text-gray-400 hover:text-accent transition-colors duration-300 sye">@ kraeuterhof.cn</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+    <script>
+        // 菜单切换功能
+        const menuToggle = document.getElementById('menuToggle');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        
+        menuToggle.addEventListener('click', function() {
+            dropdownMenu.classList.toggle('opacity-0');
+            dropdownMenu.classList.toggle('invisible');
+            dropdownMenu.classList.toggle('-translate-y-2.5');
+        });
+        
+        // 点击其他区域关闭菜单
+        document.addEventListener('click', function(event) {
+            if (!menuToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.add('opacity-0', 'invisible', '-translate-y-2.5');
+            }
+        });
+        
+        // 初始化Swiper
+        const swiper = new Swiper('.new-products-swiper', {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 2,
+                },
+                768: {
+                    slidesPerView: 3,
+                },
+                1024: {
+                    slidesPerView: 4,
+                },
+            },
+        });
+    </script>
+</body>
+</html>

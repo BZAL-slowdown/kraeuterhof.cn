@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$cat['yemianbiaoti']}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- 移除外部侵权字体（Ma Shan Zheng、Noto Serif SC） -->
+    <!-- 系统懒人版js(所有自建模板引用) -->
+    <script type="text/javascript">var is_mobile_cms = '{IS_MOBILE}';var web_dir = '{WEB_DIR}';</script>
+    <script src="{LANG_PATH}lang.js" type="text/javascript"></script>
+    <script src="{THEME_PATH}assets/global/plugins/jquery.min.js" type="text/javascript"></script>
+    <script src="{THEME_PATH}assets/js/cms.js" type="text/javascript"></script>
+    <!-- 系统懒人版js结束 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0a2463',
+                        accent: '#ffeb3b',
+                        paper: '#f5f1e6',
+                        dark: '#3e2723'
+                    },
+                    fontFamily: {
+                        'ht': ['黑体', 'SimHei', 'sans-serif'] // 仅保留黑体字体配置
+                    },
+                    backgroundImage: {
+                        'custom-bg': "url('{dr_get_file($cat['thumb'])}')",
+                    },
+                    boxShadow: {
+                        'book': '0 15px 30px rgba(0, 0, 0, 0.4), inset 0 5px 10px rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.1)',
+                        'video': '0 10px 25px -5px rgba(0, 0, 0, 0.3)',
+                        'video-hover': '0 20px 35px -10px rgba(0, 0, 0, 0.4)',
+                        'modal': '0 20px 60px rgba(0, 0, 0, 0.5)'
+                    },
+                    animation: {
+                        'twinkle': 'twinkle 2s ease-in-out infinite alternate',
+                        'float': 'float 30s ease-in-out infinite',
+                        'rotate': 'rotate 20s linear infinite',
+                        'earth-glow': 'earth-glow 3s ease-in-out infinite alternate',
+                        'earth-rotate': 'earth-rotate 40s linear infinite'
+                    },
+                    keyframes: {
+                        twinkle: {
+                            'from': { opacity: '0.5', transform: 'scale(0.8)' },
+                            'to': { opacity: '1', transform: 'scale(1)' }
+                        },
+                        float: {
+                            '0%': { transform: 'translateY(0px) translateX(0px)' },
+                            '25%': { transform: 'translateY(-20px) translateX(10px)' },
+                            '50%': { transform: 'translateY(0px) translateX(20px)' },
+                            '75%': { transform: 'translateY(20px) translateX(10px)' },
+                            '100%': { transform: 'translateY(0px) translateX(0px)' }
+                        },
+                        rotate: {
+                            'from': { transform: 'rotate(0deg)' },
+                            'to': { transform: 'rotate(360deg)' }
+                        },
+                        'earth-glow': {
+                            'from': { 
+                                boxShadow: '0 0 60px 30px rgba(33, 150, 243, 0.6), 0 0 100px 60px rgba(33, 150, 243, 0.4), 0 0 140px 90px rgba(33, 150, 243, 0.2)' 
+                            },
+                            'to': { 
+                                boxShadow: '0 0 70px 35px rgba(33, 150, 243, 0.7), 0 0 110px 65px rgba(33, 150, 243, 0.5), 0 0 150px 95px rgba(33, 150, 243, 0.3)' 
+                            }
+                        },
+                        'earth-rotate': {
+                            'from': { transform: 'rotate(0deg)' },
+                            'to': { transform: 'rotate(360deg)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 全局强制使用黑体，覆盖所有元素，优先级最高 */
+        * {
+            font-family: 黑体, SimHei, sans-serif !important;
+        }
+        
+        /* 保留一些自定义样式，因为Tailwind无法完全覆盖 */
+        .page-curl::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.1) 50%);
+            border-radius: 0 0 0 8px;
+        }
+        
+        .category-title::before {
+            left: calc(25% - 60px);
+        }
+        
+        .category-title::after {
+            right: calc(25% - 60px);
+        }
+        
+        .book-page-1.left {
+            transform: rotateY(-5deg);
+            transform-origin: right center;
+        }
+        
+        .book-page-1.right {
+            transform: rotateY(5deg);
+            transform-origin: left center;
+        }
+        
+        .book-page-1:hover {
+            transform: rotateY(0deg);
+        }
+        
+        .video-modal {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .video-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .video-modal.active .modal-content {
+            transform: scale(1);
+        }
+        
+        @media (max-width: 768px) {
+            .category-title::before {
+                left: calc(50% - 70px);
+            }
+            .category-title::after {
+                right: calc(50% - 70px);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-custom-bg bg-cover bg-center bg-no-repeat min-h-screen flex flex-col overflow-x-hidden font-sans text-gray-800 leading-rel">
+    <!-- 全屏背景图片容器 -->
+    <div class="relative w-full h-auto">
+        <div class="container mx-auto max-w-[1200px] px-4 pb-8 relative z-20">
+
+            <!-- 底部视频区域标题 -->
+
+
+            <!-- 视频网格区域 -->
+            <!-- 科学家访谈系列 -->
+            <div class="mb-12">
+                <h3 class="mt-[12px] category-title text-center text-[black] font-ht font-bold text-3xl relative inline-block w-full">{$cat['yemianbiaoti']}</h3>
+                
+                <div class="video-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
+                    <!-- 视频卡片 -->
+                    {module catid=$catid order=updatetime page=1}
+<div class="video-container rounded-lg overflow-hidden shadow-video transition-all duration-300 bg-white/10 cursor-pointer" data-video-src="{dr_get_file($t['shipin'])}">
+    <div class="relative aspect-w-16 aspect-h-9">
+        <!-- 视频添加封面图，需替换poster路径为实际封面图 -->
+        <video class="w-full h-full object-cover" poster="{dr_get_file($t['thumb'])}" preload="metadata">
+            <source src="{dr_get_file($t['shipin'])}" type="video/mp4">
+        </video>
+    </div>
+    <!-- 标题描述区域设置透明背景，文字颜色调整为白色增强对比度 -->
+    <div class="bg-white">
+        <h3 class="video-title-text font-bold text-lg mb-2 line-clamp-2 text-center">{dr_strcut($t['title'], 60, '...')}</h3>
+        <p class="video-description text-sm line-clamp-3 text-[black] text-center">{dr_strcut($t['description'], 60, '...')}</p>
+    </div>
+</div>
+{/module}
+
+    <!-- 标题描述区域设置透明背景，文字颜色调整为白色增强对比度 -->
+</div>
+            <div class="pager">{$pages}</div>
+            <style>
+                /*分页*/
+                
+                .pager {
+                    text-align: center;
+                    margin: 20px 0;
+                }
+                
+                .pager ul {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center
+                }
+                
+                .pager ul li {
+                    display: inline-block;
+                }
+                
+                .pager ul li a {
+                    padding: 5px 15px;
+                    border: #dddddd solid 1px;
+                    margin-left: -1px;
+                    display: inline-block;
+                }
+                
+                .pager ul li a:hover {
+                    border-color: #70c4f3;
+                    background-color: #70c4f3;
+                    color: #FFF
+                }
+                
+                .pager ul .active a {
+                    border: #3ea8e2 solid 1px;
+                    display: inline-block;
+                    background-color: #3ea8e2;
+                    color: #fff;
+                }
+                
+                .pager ul a:not([href]):not([class]):hover {
+                    border: #dddddd solid 1px;
+                    background-color: #fff
+                }
+                
+                .pager ul .active a:hover {
+                    color: #fff;
+                    border: #3ea8e2 solid 1px !important;
+                    background-color: #3ea8e2 !important
+                }
+            </style>
+
+<!-- 可添加全局样式增强效果（放入style标签） -->
+<style>
+    .text-shadow {
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+    /* 响应式调整，确保移动端显示正常 */
+    @media (max-width: 768px) {
+        .video-container {
+            max-width: 90vw;
+            margin: 0 auto;
+        }
+        .fas.fa-play-circle {
+            font-size: 5xl;
+        }
+    }
+</style>
+                </div>
+            </div>
+        </div>
+
+        <!-- 视频模态框 -->
+        <div class="video-modal fixed inset-0 bg-black/95 z-50 items-center justify-center hidden" id="videoModal">
+    <!-- 模态框内容容器 - 响应式调整 -->
+    <div class="modal-content relative w-full h-full max-w-none">
+        <!-- 视频容器 - 区分移动端和桌面端布局 -->
+        <div class="modal-video-container relative w-full bg-black">
+            <!-- 视频元素 - 自适应填充，保留原生控制栏完整性 -->
+            <video class="modal-video absolute top-0 left-0 w-full h-full object-contain" id="modalVideo" controls>
+                您的浏览器不支持视频播放。
+            </video>
+
+            <!-- 标题和描述区域 - 移动端精简显示 -->
+            <div class="video-info absolute left-0 bottom-0 p-3 md:p-4 text-white max-w-[80%] md:max-w-[70%] z-10">
+                <h3 class="modal-title text-accent text-base md:text-xl lg:text-2xl m-0 text-shadow" id="modalVideoTitle">视频标题</h3>
+                <p class="modal-description text-xs md:text-sm leading-normal text-shadow/90 mt-1" id="modalVideoDescription">视频描述内容</p>
+            </div>
+
+            <!-- 关闭按钮 - 响应式位置调整 -->
+            <button class="close-modal absolute top-4 right-4 bg-black/40 hover:bg-black/60 rounded-full w-9 h-9 md:w-10 md:h-10 flex items-center justify-center border-none text-white text-lg md:text-xl cursor-pointer transition-colors duration-300 hover:text-accent z-10" id="closeModal">&times;</button>
+        </div>
+    </div>
+</div>
+                <?php $mysite=dr_site_value('dibuxinxi');?>
+        {php $mval = $mysite;}
+        {loop $mval $v}
+        <div class="modal-footer bg-[#ffff] text-white p-3 md:p-4 border-t border-gray-700">
+            <div class="container mx-auto">
+                <h4 class="footer-title text-base md:text-lg font-medium text-black text-center mb-1"><a href="{$v[2]}">{$v[1]}</a></h4>
+            </div>
+        </div>
+        {/loop}
+<style>
+    .text-shadow {
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    /* 桌面端保持16:9比例 */
+    @media (min-width: 769px) {
+        .modal-video-container {
+            aspect-ratio: 16 / 9;
+            max-width: 1200px; /* 桌面端最大宽度限制 */
+            margin: 0 auto; /* 居中显示 */
+        }
+    }
+
+    /* 移动端全屏显示（高度优先） */
+    @media (max-width: 768px) {
+        .modal-video-container {
+            height: 100vh; /* 高度占满整个屏幕 */
+            width: 100vw;  /* 宽度占满整个屏幕 */
+        }
+        /* 视频在移动端优先适应高度，保持内容完整 */
+        .modal-video {
+            object-fit: contain; /* 覆盖全屏，可能裁剪边缘但保证满屏 */
+            /* 若希望完整显示不裁剪，可改用 object-contain，但可能有黑边 */
+            /* object-fit: contain; */
+        }
+        
+        /* 修复移动端控制栏全屏按钮显示 - 移除可能干扰的样式 */
+        .modal-video::-webkit-media-controls {
+            display: flex !important; /* 强制显示控制栏 */
+            bottom: 0 !important;
+            position: relative !important;
+            width: 100% !important;
+        }
+        
+        /* 确保全屏按钮不被隐藏 */
+        .modal-video::-webkit-media-controls-fullscreen-button {
+            display: block !important;
+        }
+    }
+
+    /* 全局确保视频控制栏完整显示 */
+    .modal-video {
+        /* 避免控制栏被截断 */
+        padding-bottom: 40px; /* 为控制栏预留空间 */
+        box-sizing: border-box;
+    }
+
+    /* 修复桌面端控制栏样式 */
+    @media (min-width: 769px) {
+        .modal-video::-webkit-media-controls {
+            display: flex;
+        }
+        .modal-video::-webkit-media-controls-fullscreen-button {
+            display: block;
+        }
+    }
+</style>
+
+
+    </div>
+
+    <script>
+        // 视频播放功能
+        function setupVideoPlayers() {
+            const videoContainers = document.querySelectorAll('.video-container');
+            const modal = document.getElementById('videoModal');
+            const modalVideo = document.getElementById('modalVideo');
+            const modalTitle = document.getElementById('modalVideoTitle');
+            const modalDescription = document.getElementById('modalVideoDescription');
+            const closeModal = document.getElementById('closeModal');
+
+            // 点击视频卡片打开模态框
+            videoContainers.forEach(container => {
+                container.addEventListener('click', () => {
+                    const videoSrc = container.getAttribute('data-video-src');
+                    const title = container.querySelector('.video-title-text').textContent;
+                    const description = container.querySelector('.video-description').textContent;
+
+                    // 设置模态框内容
+                    modalVideo.innerHTML = `<source src="${videoSrc}" type="video/mp4">`;
+                    modalTitle.textContent = title;
+                    modalDescription.textContent = description;
+
+                    // 显示模态框
+                    modal.classList.add('active');
+
+                    // 重新加载视频源
+                    modalVideo.load();
+
+                    // 播放视频
+                    modalVideo.play().catch(error => {
+                        console.log('视频播放失败:', error);
+                        // 如果自动播放失败，显示用户需要手动点击播放的提示
+                        modalVideo.controls = true;
+                    });
+                });
+            });
+
+            // 关闭模态框
+            closeModal.addEventListener('click', () => {
+                modal.classList.remove('active');
+                modalVideo.pause();
+                modalVideo.currentTime = 0;
+            });
+
+            // 点击模态框背景关闭
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                    modalVideo.pause();
+                    modalVideo.currentTime = 0;
+                }
+            });
+
+            // ESC键关闭模态框
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    modal.classList.remove('active');
+                    modalVideo.pause();
+                    modalVideo.currentTime = 0;
+                }
+            });
+
+            // 视频播放结束事件
+            modalVideo.addEventListener('ended', () => {
+                // 视频播放结束后可以添加一些逻辑，比如显示重播按钮等
+                console.log('视频播放结束');
+            });
+
+            // 视频错误处理
+            modalVideo.addEventListener('error', (e) => {
+                console.error('视频加载错误:', e);
+                // 可以在这里显示错误信息或备用内容
+                modalVideo.innerHTML = '<p>抱歉，视频加载失败。请检查网络连接或视频文件路径。</p>';
+            });
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            setupVideoPlayers();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人资料 - 七叶庄园</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#f3f6f4;color:#1f2f25;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif}
+    a{color:inherit;text-decoration:none}.top{background:#fff;border-bottom:1px solid #e1e7e3}
+    .top-inner{max-width:1120px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .logo img{height:52px;width:auto;display:block}.nav{display:flex;align-items:center;gap:8px;color:#4c5f52;font-size:14px;white-space:nowrap}
+    .nav a{height:36px;display:inline-flex;align-items:center;padding:0 12px;border-radius:4px}.nav a:hover,.nav .active{background:#eef5f0;color:#1c5231}
+    .wrap{max-width:1120px;margin:30px auto 68px;padding:0 24px}
+    .layout{display:grid;grid-template-columns:minmax(0,.9fr) minmax(360px,1.1fr);gap:22px;align-items:start}
+    .card,.aside{background:#fff;border:1px solid #e1e7e3;border-radius:8px;box-shadow:0 10px 28px rgba(28,82,49,.05)}
+    .card{padding:28px}.aside{padding:24px}.eyebrow{margin:0 0 8px;color:#6f8377;font-size:13px;text-transform:uppercase}
+    h1{margin:0;color:#173b27;font-size:30px;line-height:1.25}.desc{margin:12px 0 0;color:#63766a;line-height:1.8;font-size:15px}
+    .preview{margin-top:24px;padding:20px;border-radius:8px;background:#f8faf8;border:1px solid #e4ebe6;display:flex;align-items:center;gap:16px}
+    .avatar{width:72px;height:72px;border-radius:50%;background:#eaf3ed;color:#1c5231;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;overflow:hidden;flex:none}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}.preview b{display:block;color:#173b27;font-size:18px}.preview span{display:block;margin-top:6px;color:#7a8b80;font-size:13px}
+    .form-title{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}.form-title h2{margin:0;color:#173b27;font-size:22px}.form-title small{display:block;margin-top:6px;color:#7a8b80;font-size:13px}
+    .field{margin-bottom:18px}.field label{display:block;margin-bottom:8px;color:#40564a;font-weight:700;font-size:14px}
+    .field input[type=text]{width:100%;height:46px;border:1px solid #d6dfd9;border-radius:5px;padding:0 13px;font-size:15px;outline:none;background:#fff;color:#223127}
+    .field input[type=text]:focus{border-color:#1c5231;box-shadow:0 0 0 3px rgba(28,82,49,.08)}
+    .file-box{border:1px dashed #cbd8d0;border-radius:6px;background:#fafcfb;padding:18px}.file-box input{width:100%}.hint{margin-top:8px;color:#7a8b80;font-size:12px;line-height:1.6}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.btn{height:42px;border:1px solid #1c5231;border-radius:4px;padding:0 18px;background:#1c5231;color:#fff;font-size:14px;cursor:pointer}.btn.secondary{background:#fff;color:#1c5231}.btn:hover{filter:brightness(.97)}
+    .note{display:grid;gap:12px;margin-top:24px}.note div{padding:16px;border:1px solid #e5ece7;border-radius:6px;background:#fafcfb;color:#6f8377;line-height:1.6;font-size:13px}.note b{display:block;color:#173b27;margin-bottom:6px}
+    @media(max-width:860px){.top-inner,.layout{display:block}.nav{margin-top:14px;flex-wrap:wrap}.aside{margin-bottom:18px}.logo img{height:46px}.wrap{padding:0 16px}.card,.aside{padding:22px}h1{font-size:25px}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="logo" href="{SITE_URL}"><img src="/uploadfile/202512/c35e2de6b2eae6a.png" alt="七叶庄园"></a>
+      <nav class="nav">
+        <a href="{SITE_URL}">返回首页</a>
+        <a href="{SITE_URL}index.php?s=member&app=shop&c=center&m=index">会员中心</a>
+        <a class="active" href="{SITE_URL}index.php?s=member&app=shop&c=profile&m=index">个人资料</a>
+        <a href="{SITE_URL}index.php?s=member&app=shop&c=address&m=index">收货资料</a>
+        <a href="{SITE_URL}index.php?s=member&app=shop&c=order&m=index">我的订单</a>
+        <a href="{SITE_URL}index.php?s=shop&c=home&m=logout">退出登录</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="layout">
+      <aside class="aside">
+        <p class="eyebrow">Member Profile</p>
+        <h1>个人资料</h1>
+        <p class="desc">设置会员中心展示的头像和用户名称。登录账号本身仍由迅睿会员系统管理，这里只影响前台展示。</p>
+        <div class="preview">
+          <div class="avatar">{if $profile.avatar}<img src="{$profile.avatar}" alt="会员头像">{else}会{/if}</div>
+          <div>
+            <b>{$display_name}</b>
+            <span>七叶庄园会员账户</span>
+          </div>
+        </div>
+        <div class="note">
+          <div><b>头像规范</b>建议使用正方形图片，支持 jpg、png、gif、webp，大小不超过 2MB。</div>
+          <div><b>名称说明</b>用户名称用于前台展示，不影响登录账号和密码。</div>
+        </div>
+      </aside>
+
+      <section class="card">
+        <div class="form-title">
+          <div>
+            <h2>编辑资料</h2>
+            <small>保存后会同步显示在会员中心左侧头像区域。</small>
+          </div>
+        </div>
+        <form method="post" action="{SITE_URL}index.php?s=member&app=shop&c=profile&m=save" enctype="multipart/form-data">
+          <div class="field">
+            <label>用户名称</label>
+            <input type="text" name="display_name" value="{$display_name}" placeholder="请输入前台展示名称" required>
+            <div class="hint">最多 30 个字符，建议使用真实姓名、昵称或便于识别的称呼。</div>
+          </div>
+          <div class="field">
+            <label>头像上传</label>
+            <div class="file-box">
+              <input type="file" name="avatar" accept="image/jpeg,image/png,image/gif,image/webp">
+              <div class="hint">不选择图片则保留当前头像。</div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn" type="submit">保存个人资料</button>
+            <a class="btn secondary" href="{SITE_URL}index.php?s=member&app=shop&c=center&m=index">返回会员中心</a>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

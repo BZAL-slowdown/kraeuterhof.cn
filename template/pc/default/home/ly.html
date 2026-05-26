@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$cat['name']}</title>
+    <style>
+        /* 重置默认样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+
+        /* 页面整体布局：表单居中显示 */
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* 表单容器样式 */
+        .form-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        /* 表单标题 */
+        .form-title {
+            font-size: 22px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        /* 表单组样式（每个输入项） */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* 标签样式 */
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        /* 输入框/文本域通用样式 */
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #333;
+            transition: border-color 0.3s ease;
+        }
+
+        /* 聚焦样式 */
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+        }
+
+        /* 文本域样式 */
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical; /* 仅允许垂直拉伸 */
+            line-height: 1.5;
+        }
+
+        /* 提交按钮样式 */
+        .form-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #1890ff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-submit:hover {
+            background-color: #096dd9;
+        }
+
+        /* 响应式适配：小屏幕调整内边距和字体 */
+        @media (max-width: 480px) {
+            .form-container {
+                padding: 20px;
+            }
+            .form-title {
+                font-size: 20px;
+            }
+            .form-input, .form-textarea {
+                padding: 10px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2 class="form-title">留言反馈</h2>
+        
+        {php extract(dr_get_form_post_value('zxly'))}
+<form action="{$post_url}&is_show_msg=1" class="form-horizontal" method="post" name="myform" id="myform">
+    <div class="fc-form-body">
+        {$myfield}
+        {$diyfield}
+        {$sysfield}
+        {if $is_post_code}
+        <div class="form-group">
+            <label class="control-label col-md-2">{dr_lang('验证码')}</label>
+            <div class="col-md-9">
+                <label>
+                    <div class="form-recaptcha">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="code">
+                            <div class="input-group-btn fc-code">
+                                {dr_code(120, 35)}
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+        {/if}
+    </div>
+<style>
+    .col-md-10{
+        width: 100%;
+    }
+    .required{
+        color: red;
+    }
+    .col-md-2{
+        margin-top: 10px;
+        margin-bottom: 10px;
+        display: block;
+    }
+    .col-md-10 label select{
+        width: 100%;
+            padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #333;
+    transition: border-color 0.3s ease;
+    }
+</style>
+    <div class="portlet-body form myfooter">
+        <div class="form-actions text-center">
+ <button type="submit" class="form-submit"> 普通提交</button>
+        </div>
+    </div>
+</form>
+    </div>
+
+</body>
+</html>

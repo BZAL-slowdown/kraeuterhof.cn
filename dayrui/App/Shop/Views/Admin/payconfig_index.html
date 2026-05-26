@@ -1,0 +1,160 @@
+{template "header.html"}
+<div class="page-content">
+  <div class="portlet light bordered">
+    <div class="portlet-title">
+      <div class="caption"><i class="fa fa-credit-card"></i> 支付配置</div>
+    </div>
+    <div class="portlet-body">
+      <div class="margin-bottom-20">
+        <a href="{dr_url('shop/order/index')}" class="btn default"><i class="fa fa-list"></i> 订单管理</a>
+        <a href="{dr_url('shop/profile/index')}" class="btn default"><i class="fa fa-user"></i> 会员资料</a>
+        <a href="{dr_url('shop/payconfig/index')}" class="btn green"><i class="fa fa-credit-card"></i> 支付配置</a>
+        <a href="{dr_url('shop/antifake/index')}" class="btn default"><i class="fa fa-shield"></i> 防伪码导入</a>
+      </div>
+
+      <div class="alert alert-warning">
+        支付密钥和证书属于敏感资料。这里保存的是密钥文件路径，不直接展示密钥内容；正式环境请限制后台权限，并确保 `cache/pay` 目录不可被公网直接下载。
+      </div>
+
+      <form class="form-horizontal" id="myform" method="post">
+        <h4 class="form-section">微信 H5 支付</h4>
+        <div class="form-body">
+          <div class="form-group">
+            <label class="col-md-2 control-label">启用微信 H5</label>
+            <div class="col-md-8">
+              <label class="mt-radio"><input type="radio" name="wechat_enabled" value="1" {if $wechat.enabled}checked{/if}> 启用 <span></span></label>
+              <label class="mt-radio"><input type="radio" name="wechat_enabled" value="0" {if !$wechat.enabled}checked{/if}> 关闭 <span></span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">AppID</label>
+            <div class="col-md-8"><input type="text" name="appid" value="{$wechat.appid}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">商户号 mchid</label>
+            <div class="col-md-8"><input type="text" name="mchid" value="{$wechat.mchid}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">商户证书序列号</label>
+            <div class="col-md-8"><input type="text" name="merchant_serial_no" value="{$wechat.merchant_serial_no}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">APIv3 密钥</label>
+            <div class="col-md-8"><input type="text" name="api_v3_key" value="{$wechat.api_v3_key}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">商户私钥路径</label>
+            <div class="col-md-8">
+              <input type="text" name="merchant_private_key" value="{$wechat.merchant_private_key}" class="form-control">
+              <span class="help-block">当前文件：{if $private_key_exists}<span class="font-green">存在</span>{else}<span class="font-red">不存在</span>{/if}</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">平台公钥/证书路径</label>
+            <div class="col-md-8">
+              <input type="text" name="platform_public_key" value="{$wechat.platform_public_key}" class="form-control">
+              <span class="help-block">当前文件：{if $public_key_exists}<span class="font-green">存在</span>{else}<span class="font-red">不存在</span>{/if}</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">微信回调地址</label>
+            <div class="col-md-8"><input type="text" name="notify_url" value="{$wechat.notify_url}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">微信返回地址</label>
+            <div class="col-md-8"><input type="text" name="return_url" value="{$wechat.return_url}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">H5 场景域名</label>
+            <div class="col-md-8"><input type="text" name="wap_url" value="{$wechat.scene_info.wap_url}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">H5 场景名称</label>
+            <div class="col-md-8"><input type="text" name="wap_name" value="{$wechat.scene_info.wap_name}" class="form-control"></div>
+          </div>
+        </div>
+
+        <h4 class="form-section">支付宝手机网站支付</h4>
+        <div class="form-body">
+          <div class="form-group">
+            <label class="col-md-2 control-label">启用支付宝 H5</label>
+            <div class="col-md-8">
+              <label class="mt-radio"><input type="radio" name="alipay_enabled" value="1" {if $alipay.enabled}checked{/if}> 启用 <span></span></label>
+              <label class="mt-radio"><input type="radio" name="alipay_enabled" value="0" {if !$alipay.enabled}checked{/if}> 关闭 <span></span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">账户 ID / PID</label>
+            <div class="col-md-8"><input type="text" name="alipay_account_id" value="{$alipay.account_id}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">Seller ID</label>
+            <div class="col-md-8"><input type="text" name="alipay_seller_id" value="{$alipay.seller_id}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">支付宝 AppID</label>
+            <div class="col-md-8"><input type="text" name="alipay_app_id" value="{$alipay.app_id}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">应用私钥路径</label>
+            <div class="col-md-8">
+              <input type="text" name="alipay_app_private_key" value="{$alipay.app_private_key}" class="form-control">
+              <span class="help-block">当前文件：{if $alipay_private_key_exists}<span class="font-green">存在</span>{else}<span class="font-red">不存在</span>{/if}，建议为 cache/pay/alipay/app_private_key.pem</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">应用公钥路径</label>
+            <div class="col-md-8">
+              <input type="text" name="alipay_app_public_key" value="{$alipay.app_public_key}" class="form-control">
+              <span class="help-block">当前文件：{if $alipay_app_public_key_exists}<span class="font-green">存在</span>{else}<span class="font-red">不存在</span>{/if}，仅用于核对上传到支付宝平台的应用公钥。</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">支付宝公钥路径</label>
+            <div class="col-md-8">
+              <input type="text" name="alipay_public_key" value="{$alipay.alipay_public_key}" class="form-control">
+              <span class="help-block">当前文件：{if $alipay_public_key_exists}<span class="font-green">存在</span>{else}<span class="font-red">不存在</span>{/if}，这是支付宝开放平台提供的支付宝公钥，不是应用公钥。</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">支付宝回调地址</label>
+            <div class="col-md-8"><input type="text" name="alipay_notify_url" value="{$alipay.notify_url}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">支付宝返回地址</label>
+            <div class="col-md-8"><input type="text" name="alipay_return_url" value="{$alipay.return_url}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">退出返回地址</label>
+            <div class="col-md-8"><input type="text" name="alipay_quit_url" value="{$alipay.quit_url}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">支付宝网关</label>
+            <div class="col-md-8"><input type="text" name="alipay_gateway" value="{$alipay.gateway}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">产品码</label>
+            <div class="col-md-8"><input type="text" name="alipay_product_code" value="{$alipay.product_code}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">签名方式</label>
+            <div class="col-md-8"><input type="text" name="alipay_sign_type" value="{$alipay.sign_type}" class="form-control"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">字符集</label>
+            <div class="col-md-8"><input type="text" name="alipay_charset" value="{$alipay.charset}" class="form-control"></div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <div class="row">
+            <div class="col-md-offset-2 col-md-8">
+              <button type="button" onclick="dr_ajax_submit('{dr_url('shop/payconfig/save')}', 'myform', '2000', '{dr_url('shop/payconfig/index')}')" class="btn blue"><i class="fa fa-save"></i> 保存配置</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{template "footer.html"}

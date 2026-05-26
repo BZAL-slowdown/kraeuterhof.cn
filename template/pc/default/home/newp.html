@@ -1,0 +1,42 @@
+{template "header.html"}
+    <!-- 主要内容区域 - 与参考图完全一致 -->
+    <main class="bg-gray-100 py-12 md:py-20">
+        <div class="max-w-7xl mx-auto">
+            <!-- 标题部分 -->
+            <div class="text-center mb-12 md:mb-16">
+                <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-light text-gray-800 tracking-wider sybold">
+                    {$cat['lmywm']}
+                </h2>
+                <p class="mt-2 text-[clamp(1rem,2vw,1.25rem)] text-gray-600 sybold">{$cat['name']}</p>
+            </div>
+            
+            <!-- 产品展示区 -->
+            <div class="space-y-0 md:space-y-0">
+                <!-- 第一个产品 -->
+                <?php $npp=dr_site_value('xpssdycp');?>
+
+{php $mval = $npp;}
+{loop $mval $v}
+<div class="flex flex-col md:flex-row mt-4 md:mt-8 pt-4">
+    <div class="w-full md:w-1/2 bg-white flex items-center justify-center">
+        <img src="{dr_get_file($v[1])}" 
+             alt="{$v[3]}" 
+             class="w-full h-full object-contain hover:scale-105 transition-transform duration-500">
+    </div>
+<div class="w-full md:w-1/2 bg-white p-8 md:p-16 flex flex-col justify-center items-center text-center">
+    <h3 class="text-2xl md:text-3xl sybold text-gray-900 mb-1">{$v[2]}</h3>
+    <p class="text-lg md:text-xl text-gray-600 mb-6 sybold font-bold">{$v[3]}</p>
+    <a href="{$v[4]}" class="inline-flex items-center text-white hover:text-white/80 transition-colors py-2 px-4 border border-primary w-fit bg-primary mt-10">
+        查看更多
+        <i class="fa fa-chevron-right ml-2 text-sm"></i>
+    </a>
+</div>
+</div>
+{/loop}
+
+            </div>
+        </div>
+    </main>
+
+
+{template "footer.html"}

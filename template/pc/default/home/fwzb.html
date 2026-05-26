@@ -1,0 +1,370 @@
+{template "header.html"}
+<main class="bg-gray-100">
+    <div class="w-full mx-auto">
+        <!-- 顶部大图区域 -->
+        <div class="relative w-full h-[300px] md:h-[700px]">
+            <!-- 顶部满屏图片 -->
+            <img src="{dr_get_file($cat.lanmudatu)}" 
+                 alt="顶部大图" 
+                 class="w-full h-full object-cover">  
+        </div>
+        
+    <!-- 最新产品区域 -->
+    <div class="max-w-7xl h-auto mx-auto py-10">
+                    <div class="text-center mb-14 mt-14">
+                <h3 class="text-2xl md:text-4xl text-black">{$cat.lmywm}</h3>
+                <p class=" text-2xl md:text-4xl text-black">{$cat.name}</p>
+            </div>
+            <img src="{dr_get_file($cat['lanmuertu'])}" class="border-8 border-gray-200 shadow-lg w-full h-full">
+    </div>
+<div class="max-w-7xl h-auto mx-auto py-10">
+    <!-- 标题 -->
+                         <div class="text-center mb-14 mt-14">
+                <h3 class="text-2xl md:text-4xl text-black">Computer verification</h3>
+                <p class=" text-2xl md:text-4xl text-black">电脑端验证</p>
+            </div>
+    
+    <!-- 验证表单区域 -->
+    <div class="border border-gray-300 p-8 md:p-24 bg-white shadow-sm">
+    <!-- 合并后的防伪码输入框（支持14/18位） -->
+    <div class="mb-6">
+        <label for="code" class="block text-gray-600 mb-2">请输入14位或18位防伪码</label>
+        <div class="flex">
+            <input type="text" id="code" 
+                   class="flex-1 border border-gray-300 px-3 py-2 focus:outline-none focus:border-primary"
+                   placeholder="支持14/18位数字和字母组合">
+            <button class="bg-[#1C5232] text-white px-4 py-2 ml-0 hover:bg-green-800 transition-colors"
+                    onclick="checkCode()">
+                真伪查询
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 防伪查询结果弹窗 -->
+<div class="card-modal" id="codeModal">
+    <div class="modal-content">
+        <span class="close-modal text-gray-600 hover:text-gray-800"><i class="fas fa-times"></i></span>
+        <div class="modal-body" id="codeResult"></div>
+    </div>
+</div>
+
+<style>
+    /* 弹窗样式（与名片弹窗保持一致） */
+    .card-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    .card-modal.active {
+        display: flex;
+    }
+    .modal-content {
+        background: white;
+        width: 90%;
+        max-width: 600px;
+        border-radius: 8px;
+        padding: 2rem;
+        position: relative;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    .close-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+    /* 结果内容样式 */
+    .modal-body {
+        line-height: 1.8;
+        font-size: 16px;
+    }
+    .modal-body .valid {
+        color: #1C5232;
+        font-weight: bold;
+    }
+    .modal-body .invalid {
+        color: #dc2626;
+        font-weight: bold;
+    }
+    .modal-body p {
+        margin: 0.8rem 0;
+    }
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+        .modal-body {
+            font-size: 14px;
+        }
+    }
+</style>
+
+<!-- 第一步：通过模块调用渲染防伪码数据到隐藏容器 -->
+<div id="validCodesContainer" style="display: none;">
+    {module module=fwzb catid=17 num=10000 order=displayorder,updatetime}
+        <div class="code-item" 
+             data-code="{$t.title}" 
+             data-scsj="{$t.scsj}" 
+             data-shengchandi="{$t.shengchandi}" 
+             data-tishi="{$t.tishi}">
+        </div>
+    {/module}
+</div>
+
+<script>
+    // 初始化弹窗元素
+    const codeModal = document.getElementById('codeModal');
+    const codeResult = document.getElementById('codeResult');
+    const closeModal = document.querySelector('.close-modal');
+
+    // 关闭弹窗事件
+    closeModal.addEventListener('click', () => {
+        codeModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    });
+
+    // 点击弹窗外部关闭
+    codeModal.addEventListener('click', (e) => {
+        if (e.target === codeModal) {
+            codeModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // 第二步：从隐藏容器读取模块渲染的防伪码数据，构建查询对象
+    const validCodes = {};
+    // 获取所有模块渲染的防伪码项
+    const codeItems = document.querySelectorAll('#validCodesContainer .code-item');
+    codeItems.forEach(item => {
+        const code = item.getAttribute('data-code')?.toLowerCase() || '';
+        if (code) { // 过滤空值
+            validCodes[code] = {
+                scsj: item.getAttribute('data-scsj') || '未填写',
+                shengchandi: item.getAttribute('data-shengchandi') || '未填写',
+                tishi: item.getAttribute('data-tishi') || '该防伪码有效，为正品'
+            };
+        }
+    });
+
+    // 工具函数：全角转半角 + 去除所有空格
+    function formatCode(str) {
+        // 去除所有空格（包括首尾、中间）
+        let res = str.replace(/\s+/g, '');
+        // 全角转半角
+        res = res.replace(/[\uff00-\uffff]/g, function(char) {
+            return String.fromCharCode(char.charCodeAt(0) - 65248);
+        });
+        // 转小写（统一匹配规则，避免大小写问题）
+        return res.toLowerCase();
+    }
+
+    // 工具函数：校验字符是否仅包含数字和字母
+    function isOnlyNumAndLetter(str) {
+        for (let i = 0; i < str.length; i++) {
+            const charCode = str.charCodeAt(i);
+            // 0-9 (48-57) 或 a-z (97-122)
+            if (!((charCode >= 48 && charCode <= 57) || (charCode >= 97 && charCode <= 122))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // 防伪码验证核心函数（完全放弃正则，分步验证）
+    function checkCode() {
+        // 获取输入值
+        const codeInput = document.getElementById('code');
+        const originalCode = codeInput.value;
+        // 清洗输入内容：去空格、全角转半角、转小写
+        const code = formatCode(originalCode);
+        
+        // 1. 空值验证
+        if (!code) {
+            showResult(`<p class="invalid">错误：请输入14位或18位防伪码</p>`);
+            return;
+        }
+
+        // 2. 长度验证（仅允许14或18位）
+        const codeLength = code.length;
+        if (codeLength !== 14 && codeLength !== 18) {
+            showResult(`<p class="invalid">错误：防伪码长度不正确，当前为${codeLength}位，请输入14位或18位</p>`);
+            codeInput.focus();
+            return;
+        }
+
+        // 3. 字符类型验证（仅允许数字和字母）
+        if (!isOnlyNumAndLetter(code)) {
+            showResult(`<p class="invalid">错误：防伪码包含非法字符，仅支持数字和字母组合</p>`);
+            codeInput.focus();
+            return;
+        }
+
+        // 4. 匹配模块渲染的防伪码列表
+        setTimeout(() => {
+            const result = validCodes[code];
+            
+            // 组装结果HTML
+            let resultHtml = '';
+            if (result) {
+                // 匹配成功：显示模块里的正品信息
+                resultHtml = `
+                    <p class="valid">✅ ${result.tishi}</p>
+                    <p><strong>防伪码：</strong>${code}</p>
+                    <p><strong>生产时间：</strong>${result.scsj}</p>
+                    <p><strong>生产地：</strong>${result.shengchandi}</p>
+                    <p><strong>查询时间：</strong>${new Date().toLocaleString()}</p>
+                `;
+            } else {
+                // 匹配失败：显示自定义内容
+                resultHtml = `
+                    <p class="invalid">❌ 自定义提示：该防伪码无效，非官方正品！</p>
+                    <p>温馨提示：请检查防伪码是否输入正确，或联系官方客服（400-123-4567）核实。</p>
+                    <p>正品防伪码特征：14位/18位数字字母组合，无空格、无特殊字符。</p>
+                `;
+            }
+            
+            // 显示结果弹窗
+            showResult(resultHtml);
+            
+        }, 500); // 模拟网络延迟
+    }
+
+    // 显示查询结果到弹窗
+    function showResult(html) {
+        codeResult.innerHTML = html;
+        codeModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // 可选：输入框回车触发查询
+    document.getElementById('code').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') checkCode();
+    });
+
+    // 可选：输入时自动清洗（实时去空格、转半角）
+    document.getElementById('code').addEventListener('input', function() {
+        this.value = formatCode(this.value);
+    });
+</script>
+</div>
+        
+        <div class="mt-16 text-center">
+            <div class="mt-20 mb-20">
+                <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-light text-gray-800 tracking-wider sybold">
+                    Latest Products
+                </h2>
+                <p class="mt-2 text-[clamp(1rem,2vw,1.25rem)] text-gray-600 sybold">最新产品</p>
+    </div>
+    <!-- 黑色背景Swiper容器 -->
+    <div class="bg-primary text-white p-8 relative">
+        <!-- 左右箭头 -->
+        <button class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10" id="prevBtn">
+            <i class="fa fa-chevron-left"></i>
+        </button>
+        <button class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10" id="nextBtn">
+            <i class="fa fa-chevron-right"></i>
+        </button>
+        
+        <!-- Swiper内容 -->
+        <div class="flex space-x-7 overflow-x-auto py-4 scrollbar-hide" id="swiperContainer">
+            <!-- Swiper名片1 -->
+            {module module=cp catid=11 num=10 order=displayorder,updatetime}
+            <div class="min-w-[280px] text-gray-900 overflow-hidden flex-shrink-0 swiper-item">
+                <!-- 内容保持不变 -->
+                <div class="bg-white p-2 h-80 flex items-center justify-center">
+    <img src="{dr_get_file($t.thumb)}" 
+         alt="{$t.title}" 
+         class="max-w-full max-h-60 object-contain bg-white">
+</div>
+                <div class="p-4 justify-center items-center text-center">
+                    <h4 class="text-base font-bold mb-2 leading-tight text-white text-center">
+                        {$t.yingwenming}
+                    </h4>
+                    <h4 class="text-base font-bold mb-2 leading-tight text-white text-center">
+                        {$t.title}
+                    </h4>
+                    {if $t.price}
+                    <div class="text-center text-white/90 text-sm md:text-base font-semibold mb-2">￥{dr_price_value($t.price)}</div>
+                    {/if}
+                    <a href="{$t.url}" class="inline-block bg-white text-primary px-4 py-1.5 text-sm hover:bg-dark transition-colors duration-300 ">
+        查看更多>
+    </a>
+                </div>
+            </div>
+            {/module}
+            <!-- 继续添加其他名片 -->
+        </div>
+    </div>
+</div>
+<style>
+    .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+</style>
+<script>
+    // 获取元素
+    const swiperContainer = document.getElementById('swiperContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const items = document.querySelectorAll('.swiper-item');
+    
+    // 计算每次滚动距离（单个卡片宽度+间距）
+    const itemWidth = 280 + 28; // 280px宽度 + 7*4px间距（space-x-7对应28px）
+    
+    // 左箭头点击事件
+    prevBtn.addEventListener('click', () => {
+        swiperContainer.scrollBy({
+            left: -itemWidth,
+            behavior: 'smooth'
+        });
+    });
+    
+    // 右箭头点击事件
+    nextBtn.addEventListener('click', () => {
+        swiperContainer.scrollBy({
+            left: itemWidth,
+            behavior: 'smooth'
+        });
+    });
+    
+    // 自动播放功能
+    let autoPlayInterval;
+    function startAutoPlay() {
+        autoPlayInterval = setInterval(() => {
+            // 计算是否滚动到最后
+            const maxScrollLeft = swiperContainer.scrollWidth - swiperContainer.clientWidth;
+            if (swiperContainer.scrollLeft >= maxScrollLeft) {
+                swiperContainer.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                swiperContainer.scrollBy({ left: itemWidth, behavior: 'smooth' });
+            }
+        }, 3000); // 每3秒滚动一次
+    }
+    
+    // 鼠标悬停时暂停自动播放
+    swiperContainer.parentElement.addEventListener('mouseenter', () => {
+        clearInterval(autoPlayInterval);
+    });
+    
+    // 鼠标离开时恢复自动播放
+    swiperContainer.parentElement.addEventListener('mouseleave', startAutoPlay);
+    
+    // 初始化自动播放
+    startAutoPlay();
+</script>
+    </div>
+
+</main>
+{template "footer.html"}

@@ -1,0 +1,290 @@
+{template "header.html"}
+<main class="bg-gray-100">
+    <div class="w-full mx-auto">
+        <!-- 顶部大图区域 -->
+        <div class="relative w-full h-[300px] md:h-[700px]">
+            <!-- 顶部满屏图片 -->
+            <img src="{dr_get_file($cat.lanmudatu)}" 
+                 alt="顶部大图" 
+                 class="w-full h-full object-cover">  
+        </div>
+        
+    <!-- 最新产品区域 -->
+    <div class="max-w-7xl h-auto mx-auto py-10">
+                    <div class="text-center mb-14 mt-14">
+                <h3 class="text-2xl md:text-4xl text-black">Sales channels (online)</h3>
+                <p class=" text-2xl md:text-4xl text-black">销售渠道(线上)<p class=" text-1xl md:text-2xl text-black">点击查看详情</p></p>
+            </div>
+                <!-- 名片展示容器 -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- 名片列表：电脑一行4个，手机一行2个 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 card-list hidden-cards" id="cardList">
+            {module module=xsjd catid=16 num=10 order=displayorder,updatetime}
+            {content id=$t.id module=xsjd return=c}
+            <!-- 名片项1 -->
+            <div class="card-item bg-white rounded-lg shadow-md p-4 text-center">
+                <img src="{dr_get_file($t.thumb)}" alt="名片图片" class="w-24 h-24 rounded-full mx-auto border-4 border-gray-200 shadow-lg object-cover">
+                <h3 class="mt-4 text-lg font-semibold text-gray-800 cursor-pointer card-title"
+                    data-content="{$c.content}">
+                    {$t.title}
+                </h3>
+            </div>
+            {/content}
+{/module}
+        </div>
+
+        <!-- 查看更多按钮 -->
+        <div class="text-center mt-8" id="loadMoreBtn">
+            <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                查看更多
+            </button>
+        </div>
+    </div>
+
+    <!-- 名片详情弹窗 -->
+    <div class="card-modal" id="cardModal">
+        <div class="modal-content">
+            <span class="close-modal text-gray-600 hover:text-gray-800"><i class="fas fa-times"></i></span>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+    <style>
+        /* 自定义弹窗样式 */
+        .card-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .card-modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            padding: 2rem;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        /* 富文本内容样式重置（关键：保证富文本正常显示） */
+        .modal-body {
+            line-height: 1.8;
+            font-size: 16px;
+        }
+        .modal-body * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .modal-body img {
+            display: block;
+            margin: 1rem auto;
+            border-radius: 4px;
+        }
+        .modal-body p {
+            margin: 0.8rem 0;
+        }
+        .modal-body h1, .modal-body h2, .modal-body h3 {
+            margin: 1rem 0 0.5rem;
+        }
+        .modal-body a {
+            color: #3b82f6;
+            text-decoration: underline;
+        }
+        /* 隐藏超出默认两行的名片 */
+        .card-list.hidden-cards .card-item:nth-child(n+9) {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .card-list.hidden-cards .card-item:nth-child(n+5) {
+                display: none;
+            }
+            .modal-body {
+                font-size: 14px;
+            }
+        }
+    </style>
+    <script>
+        // 修复3：DOM加载完成后再执行脚本
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. 弹窗功能（优化富文本渲染）
+            const modal = document.getElementById('cardModal');
+            const modalBody = document.getElementById('modalBody');
+            const closeModal = document.querySelector('.close-modal');
+            const cardTitles = document.querySelectorAll('.card-title');
+
+            // 点击标题打开弹窗
+            cardTitles.forEach(title => {
+                title.addEventListener('click', () => {
+                    // 修复4：容错处理，避免空内容报错
+                    const content = title.getAttribute('data-content')?.trim() || '暂无详细内容';
+                    // 确保富文本完整渲染
+                    modalBody.innerHTML = content;
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            // 关闭弹窗
+            closeModal.addEventListener('click', () => {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            // 点击弹窗外部关闭
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // 2. 加载更多功能
+            const cardList = document.getElementById('cardList');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+            loadMoreBtn.addEventListener('click', () => {
+                cardList.classList.remove('hidden-cards');
+                loadMoreBtn.style.display = 'none';
+            });
+        });
+    </script>
+    </div>
+
+        <div class="max-w-7xl h-auto mx-auto py-10">
+                    <div class="text-center mb-14 mt-14">
+                <h3 class="text-2xl md:text-4xl text-black">Sales channels (online)</h3>
+                <p class=" text-2xl md:text-4xl text-black">销售渠道(线下)</p>
+            </div>
+            <img src="{dr_get_file($cat['lanmuertu'])}" class="border-8 border-gray-200 shadow-lg w-full h-full">
+    </div>
+
+        
+        <div class="mt-16 text-center">
+            <div class="mt-20 mb-20">
+                <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-light text-gray-800 tracking-wider sybold">
+                    Latest Products
+                </h2>
+                <p class="mt-2 text-[clamp(1rem,2vw,1.25rem)] text-gray-600 sybold">最新产品</p>
+    </div>
+    <!-- 黑色背景Swiper容器 -->
+    <div class="bg-primary text-white p-8 relative">
+        <!-- 左右箭头 -->
+        <button class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10" id="prevBtn">
+            <i class="fa fa-chevron-left"></i>
+        </button>
+        <button class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10" id="nextBtn">
+            <i class="fa fa-chevron-right"></i>
+        </button>
+        
+        <!-- Swiper内容 -->
+        <div class="flex space-x-7 overflow-x-auto py-4 scrollbar-hide" id="swiperContainer">
+            <!-- Swiper名片1 -->
+            {module module=cp catid=11 num=10 order=displayorder,updatetime}
+            <div class="min-w-[280px] text-gray-900 overflow-hidden flex-shrink-0 swiper-item">
+                <!-- 内容保持不变 -->
+                <div class="bg-white p-2 h-80 flex items-center justify-center">
+    <img src="{dr_get_file($t.thumb)}" 
+         alt="{$t.title}" 
+         class="max-w-full max-h-60 object-contain bg-white">
+</div>
+                <div class="p-4 justify-center items-center text-center">
+                    <h4 class="text-base font-bold mb-2 leading-tight text-white text-center">
+                        {$t.yingwenming}
+                    </h4>
+                    <h4 class="text-base font-bold mb-2 leading-tight text-white text-center">
+                         {$t.title}
+                    </h4>
+                    {if $t.price}
+                    <div class="text-center text-white/90 text-sm md:text-base font-semibold mb-2">￥{dr_price_value($t.price)}</div>
+                    {/if}
+                    <a href="{$t.url}" class="inline-block bg-white text-primary px-4 py-1.5 text-sm hover:bg-dark transition-colors duration-300 ">
+        查看更多>
+    </a>
+                </div>
+            </div>
+            {/module}
+            <!-- 继续添加其他名片 -->
+        </div>
+    </div>
+</div>
+<style>
+    .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+</style>
+<script>
+    // 获取元素
+    const swiperContainer = document.getElementById('swiperContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const items = document.querySelectorAll('.swiper-item');
+    
+    // 计算每次滚动距离（单个卡片宽度+间距）
+    const itemWidth = 280 + 28; // 280px宽度 + 7*4px间距（space-x-7对应28px）
+    
+    // 左箭头点击事件
+    prevBtn.addEventListener('click', () => {
+        swiperContainer.scrollBy({
+            left: -itemWidth,
+            behavior: 'smooth'
+        });
+    });
+    
+    // 右箭头点击事件
+    nextBtn.addEventListener('click', () => {
+        swiperContainer.scrollBy({
+            left: itemWidth,
+            behavior: 'smooth'
+        });
+    });
+    
+    // 自动播放功能
+    let autoPlayInterval;
+    function startAutoPlay() {
+        autoPlayInterval = setInterval(() => {
+            // 计算是否滚动到最后
+            const maxScrollLeft = swiperContainer.scrollWidth - swiperContainer.clientWidth;
+            if (swiperContainer.scrollLeft >= maxScrollLeft) {
+                swiperContainer.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                swiperContainer.scrollBy({ left: itemWidth, behavior: 'smooth' });
+            }
+        }, 3000); // 每3秒滚动一次
+    }
+    
+    // 鼠标悬停时暂停自动播放
+    swiperContainer.parentElement.addEventListener('mouseenter', () => {
+        clearInterval(autoPlayInterval);
+    });
+    
+    // 鼠标离开时恢复自动播放
+    swiperContainer.parentElement.addEventListener('mouseleave', startAutoPlay);
+    
+    // 初始化自动播放
+    startAutoPlay();
+</script>
+    </div>
+
+</main>
+
+{template "footer.html"}

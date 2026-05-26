@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$cat['yemianbiaoti']}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- 移除外部侵权字体（Ma Shan Zheng、Noto Serif SC） -->
+    <!-- 系统懒人版js(所有自建模板引用) -->
+    <script type="text/javascript">var is_mobile_cms = '{IS_MOBILE}';var web_dir = '{WEB_DIR}';</script>
+    <script src="{LANG_PATH}lang.js" type="text/javascript"></script>
+    <script src="{THEME_PATH}assets/global/plugins/jquery.min.js" type="text/javascript"></script>
+    <script src="{THEME_PATH}assets/js/cms.js" type="text/javascript"></script>
+    <!-- 系统懒人版js结束 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0a2463',
+                        accent: '#ffeb3b',
+                        paper: '#f5f1e6',
+                        dark: '#3e2723'
+                    },
+                    fontFamily: {
+                        'ht': ['黑体', 'SimHei', 'sans-serif'] // 仅保留黑体字体配置
+                    },
+                    backgroundImage: {
+                        'custom-bg': "url('back1.jpg')",
+                    },
+                    boxShadow: {
+                        'book': '0 15px 30px rgba(0, 0, 0, 0.4), inset 0 5px 10px rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.1)',
+                        'news': '0 10px 25px -5px rgba(0, 0, 0, 0.2)',
+                        'news-hover': '0 20px 35px -10px rgba(0, 0, 0, 0.3)',
+                        'modal': '0 20px 60px rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 全局强制使用黑体，覆盖所有元素，优先级最高 */
+        * {
+            font-family: 黑体, SimHei, sans-serif !important;
+        }
+        
+        .page-curl::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.1) 50%);
+            border-radius: 0 0 0 8px;
+        }
+        
+        .category-title {
+            position: relative;
+            padding: 0 20px;
+        }
+        
+        .category-title::before {
+            left: calc(25% - 60px);
+        }
+        
+        .category-title::after {
+            right: calc(25% - 60px);
+        }
+        
+        @media (max-width: 768px) {
+            .category-title::before {
+                left: calc(50% - 70px);
+                transform: translateX(-100%) translateY(-50%);
+            }
+            .category-title::after {
+                right: calc(50% - 70px);
+                transform: translateX(100%) translateY(-50%);
+            }
+        }
+        
+        .news-card {
+            transition: all 0.3s ease;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--tw-shadow-news-hover);
+        }
+    </style>
+</head>
+
+<body class="bg-white min-h-screen flex flex-col overflow-x-hidden font-sans text-gray-800 leading-relaxed">
+    <!-- 内容容器 -->
+    <div class="relative w-full h-auto">
+        <div class="search-container flex items-center max-w-2xl mx-auto px-4 py-6">
+    <input 
+    name="keyword" value="{$keyword}" id="search_keyword"
+      type="text" 
+      class="search-input flex-1 px-4 py-3 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+      placeholder="请输入搜索内容..."
+    >
+    <button onclick="dr_module_search()" type="button" class="search-btn px-6 py-3 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 active:bg-blue-700 transition-all duration-300">
+      搜索
+    </button>
+    <script>
+    function dr_module_search(name) {
+        var url="{dr_search_url($params, 'keyword', 'xbmbdy', 'news')}";
+        var val = $("#search_keyword").val();
+        if (val) {
+            url = url.replace('xbmbdy', val);
+        } else {
+            url = url.replace('xbmbdy', '');
+        }
+        location.href=url;
+        return false;
+    }
+</script>
+  </div>
+        <div class="container mx-auto max-w-[1200px] px-4 pb-8 relative z-20">
+
+            <!-- 新闻列表区域 -->
+            {if $sototal}
+            <div class="mb-12">
+                <h3 class="mt-[12px] category-title text-center text-[black] font-ht font-bold text-3xl relative inline-block w-full">{$cat['yemianbiaoti']}</h3>
+                
+                <div class="news-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
+                    {search module=MOD_DIR id=$searchid total=$sototal order=$params.order catid=$catid page=1 pagesize=12 urlrule=$urlrule}
+                    <!-- 新闻卡片1 -->
+                    <a href="{$t['url']}" class="news-card bg-white rounded-lg overflow-hidden shadow-news">
+                        <div class="relative aspect-w-16 aspect-h-9 overflow-hidden">
+                            <img src="{dr_get_file($t['thumb'])}" alt="($t['thumb'])" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-center text-xs text-gray-500 mb-2">
+                                <i class="fa fa-calendar-o mr-1"></i>
+                                <span>{dr_date($t['_inputtime'], 'Y-m-d')}</span>
+                            </div>
+                            <h3 class="news-title font-bold text-lg mb-2 text-primary line-clamp-2 text-center">{dr_strcut($t['title'], 30, '...')}</h3>
+                            <p class="news-desc text-sm text-gray-600 line-clamp-3 text-center">{dr_strcut($t['description'], 300, '...')}</p>
+                            {if $t.price}
+                            <p class="text-center text-primary font-semibold mt-2">￥{dr_price_value($t.price)}</p>
+                            {/if}
+                        </div>
+                    </a>
+{/search}
+                </div>
+            </div>
+                        <div class="pager">{$pages}</div>
+            <style>
+                /*分页*/
+                
+                .pager {
+                    text-align: center;
+                    margin: 20px 0;
+                }
+                
+                .pager ul {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center
+                }
+                
+                .pager ul li {
+                    display: inline-block;
+                }
+                
+                .pager ul li a {
+                    padding: 5px 15px;
+                    border: #dddddd solid 1px;
+                    margin-left: -1px;
+                    display: inline-block;
+                }
+                
+                .pager ul li a:hover {
+                    border-color: #70c4f3;
+                    background-color: #70c4f3;
+                    color: #FFF
+                }
+                
+                .pager ul .active a {
+                    border: #3ea8e2 solid 1px;
+                    display: inline-block;
+                    background-color: #3ea8e2;
+                    color: #fff;
+                }
+                
+                .pager ul a:not([href]):not([class]):hover {
+                    border: #dddddd solid 1px;
+                    background-color: #fff
+                }
+                
+                .pager ul .active a:hover {
+                    color: #fff;
+                    border: #3ea8e2 solid 1px !important;
+                    background-color: #3ea8e2 !important
+                }
+            </style>
+            {else}
+            <h3 class="mt-[12px] category-title text-center text-[black] font-ht font-bold text-3xl relative inline-block w-full">您搜索的关键词没有内容</h3>
+            {/if}
+        </div>
+
+        <!-- 页脚 -->
+                <?php $mysite=dr_site_value('dibuxinxi');?>
+        {php $mval = $mysite;}
+        {loop $mval $v}
+        <div class="modal-footer bg-[#ffff] text-white p-3 md:p-4 border-t border-gray-700">
+            <div class="container mx-auto">
+                <h4 class="footer-title text-base md:text-lg font-medium text-black text-center mb-1"><a href="{$v[2]}">{$v[1]}</a></h4>
+            </div>
+        </div>
+        {/loop}
+    </div>
+
+    <script>
+        // 页面滚动效果
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const cards = document.querySelectorAll('.news-card');
+            
+            // 为可见区域的卡片添加渐入效果
+            cards.forEach((card, index) => {
+                const cardTop = card.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (cardTop < windowHeight * 0.85) {
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 100);
+                }
+            });
+        });
+        
+        // 初始化卡片样式
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.news-card');
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+            });
+            
+            // 触发一次滚动事件以显示初始可见的卡片
+            window.dispatchEvent(new Event('scroll'));
+        });
+    </script>
+</body>
+</html>
