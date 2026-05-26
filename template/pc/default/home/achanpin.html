@@ -232,14 +232,24 @@ $shop_alipay_enabled = !empty($shop_alipay_config['enabled'])
     });
 
     const shopPayTypeValue = document.getElementById('shopPayTypeValue');
-    const payTypeChoices = document.querySelectorAll('[data-shop-pay-type]');
-    payTypeChoices.forEach((choice) => {
-      choice.addEventListener('change', () => {
-        if (choice.checked && shopPayTypeValue) {
-          shopPayTypeValue.value = choice.value;
-        }
-      });
+    const shopOrderForm = document.getElementById('shopOrderForm');
+
+    function syncShopPayType() {
+      const checkedPayType = document.querySelector('[data-shop-pay-type]:checked');
+      if (checkedPayType && shopPayTypeValue) {
+        shopPayTypeValue.value = checkedPayType.value;
+      }
+    }
+
+    document.addEventListener('change', (event) => {
+      if (event.target && event.target.matches('[data-shop-pay-type]')) {
+        syncShopPayType();
+      }
     });
+
+    if (shopOrderForm) {
+      shopOrderForm.addEventListener('submit', syncShopPayType);
+    }
   </script>
     <!-- 最新产品区域 -->
         <!-- 支付配送信息区域 -->
