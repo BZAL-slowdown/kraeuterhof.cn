@@ -104,6 +104,7 @@ class WechatH5
             CURLOPT_HTTPHEADER => [
                 'Accept: application/json',
                 'Content-Type: application/json',
+                'User-Agent: kraeuterhof.cn WeChatPayClient/1.0',
                 'Authorization: '.$authorization,
             ],
             CURLOPT_POSTFIELDS => $json,
