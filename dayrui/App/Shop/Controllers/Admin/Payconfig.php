@@ -40,7 +40,7 @@ class Payconfig extends \Phpcmf\App
         $content .= "        'merchant_private_key' => ".$this->exportPath($this->postOrOld('merchant_private_key', $oldWechat['merchant_private_key'] ?? '') ?: "WRITEPATH.'pay/wechat/apiclient_key.pem'").",\n";
         $content .= "        'platform_public_key' => ".$this->exportPath($this->postOrOld('platform_public_key', $oldWechat['platform_public_key'] ?? '') ?: "WRITEPATH.'pay/wechat/wechatpay_public.pem'").",\n";
         $content .= "        'api_v3_key' => ".$this->exportString($this->postOrOld('api_v3_key', $oldWechat['api_v3_key'] ?? '')).",\n";
-        $content .= "        'notify_url' => ".$this->exportUrl($this->postOrOld('notify_url', $oldWechat['notify_url'] ?? '') ?: "SITE_URL.'index.php?s=shop&c=pay&m=notify'").",\n";
+        $content .= "        'notify_url' => ".$this->exportUrl($this->postOrOld('notify_url', $oldWechat['notify_url'] ?? '') ?: "SITE_URL.'wechatpay_notify.php'").",\n";
         $content .= "        'return_url' => ".$this->exportUrl($this->postOrOld('return_url', $oldWechat['return_url'] ?? '') ?: "SITE_URL.'index.php?s=shop&c=pay&m=return_page&out_trade_no={out_trade_no}'").",\n";
         $content .= "        'scene_info' => [\n";
         $content .= "            'type' => 'Wap',\n";

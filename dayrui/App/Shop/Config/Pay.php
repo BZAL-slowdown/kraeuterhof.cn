@@ -9,7 +9,7 @@ return [
         'merchant_private_key' => WRITEPATH.'pay/wechat/apiclient_key.pem',
         'platform_public_key' => WRITEPATH.'pay/wechat/wechatpay_public.pem',
         'api_v3_key' => '',
-        'notify_url' => SITE_URL.'index.php?s=shop&c=pay&m=notify',
+        'notify_url' => SITE_URL.'wechatpay_notify.php',
         'return_url' => SITE_URL.'index.php?s=shop&c=pay&m=return_page&out_trade_no={out_trade_no}',
         'scene_info' => [
             'type' => 'Wap',
