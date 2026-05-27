@@ -40,7 +40,11 @@ class AlipayWap
         ];
 
         $params['sign'] = $this->sign($params);
-        return $this->buildForm($this->gateway(), $params);
+
+        $charset = (string)($params['charset'] ?? 'utf-8');
+        unset($params['charset']);
+
+        return $this->buildForm($this->gateway($charset), $params);
     }
 
     public function verify(array $params)
@@ -101,9 +105,11 @@ class AlipayWap
         return $html;
     }
 
-    private function gateway()
+    private function gateway($charset = 'utf-8')
     {
-        return !empty($this->config['gateway']) ? (string)$this->config['gateway'] : 'https://openapi.alipay.com/gateway.do';
+        $gateway = !empty($this->config['gateway']) ? (string)$this->config['gateway'] : 'https://openapi.alipay.com/gateway.do';
+        $separator = strpos($gateway, '?') === false ? '?' : '&';
+        return $gateway.$separator.'charset='.rawurlencode($charset ?: 'utf-8');
     }
 
     private function assertCreateConfig()
