@@ -67,7 +67,7 @@ class AlipayWap
 
     private function sign(array $params)
     {
-        unset($params['sign'], $params['sign_type']);
+        unset($params['sign']);
         $content = $this->signContent($params);
         $privateKey = $this->privateKey((string)($this->config['app_private_key'] ?? $this->config['merchant_private_key'] ?? ''));
         $signature = '';
