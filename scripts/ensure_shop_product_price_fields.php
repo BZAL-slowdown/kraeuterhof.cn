@@ -225,7 +225,7 @@ foreach ([$prefix.'1_share_category', $prefix.'1_cp_category'] as $categoryTable
     echo "Updated category field whitelist {$categoryTable}: {$changed}\n";
 }
 
-foreach (['template', 'module', 'table', 'config'] as $cacheDir) {
+foreach (['template', 'table', 'config'] as $cacheDir) {
     clear_cache_dir($root.'/cache/'.$cacheDir);
     echo "Cleared cache/{$cacheDir}\n";
 }
@@ -233,9 +233,6 @@ foreach (['template', 'module', 'table', 'config'] as $cacheDir) {
 $dataCachePatterns = [
     'table-*.cache',
     'table-field.cache',
-    'module-*.cache',
-    'form-*.cache',
-    'urlrule.cache',
 ];
 foreach ($dataCachePatterns as $pattern) {
     foreach (glob($root.'/cache/data/'.$pattern) ?: [] as $cacheFile) {
@@ -243,6 +240,7 @@ foreach ($dataCachePatterns as $pattern) {
         echo 'Removed cache/data/'.basename($cacheFile)."\n";
     }
 }
+echo "Skipped cache/data/module-*.cache to avoid breaking app routing. Use admin System Cache > Update Cache when module cache refresh is needed.\n";
 
 echo "\nVerification:\n";
 foreach (array_keys($fieldSettings) as $fieldname) {
@@ -257,4 +255,4 @@ foreach (array_keys($fieldSettings) as $fieldname) {
     echo "{$fieldname}: {$columnOk}; {$fieldOk}\n";
 }
 
-echo "\nDone. Open admin product edit page, then use System Cache > update cache if the fields are still not visible.\n";
+echo "\nDone. Open admin product edit page, then use System Cache > Update Cache if the fields are still not visible.\n";
