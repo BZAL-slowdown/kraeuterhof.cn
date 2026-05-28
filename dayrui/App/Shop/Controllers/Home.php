@@ -35,7 +35,17 @@ class Home extends \Phpcmf\App
             $this->_msg(0, '产品不存在或未发布');
         }
 
-        $unitPrice = $this->resolvePrice($product, $shop);
+        $skuPrice = $this->resolveSkuPrice($product, $shop, $sku);
+        if ($sku && !$skuPrice) {
+            $this->_msg(0, '当前规格不存在或未设置价格，请重新选择规格');
+        }
+
+        if ($skuPrice) {
+            $sku = $skuPrice['name'];
+            $unitPrice = $skuPrice['after'];
+        } else {
+            $unitPrice = $this->resolvePrice($product, $shop);
+        }
         if ($unitPrice === null || $unitPrice <= 0) {
             $this->_msg(0, '当前商品未设置价格，请先在后台填写商品价格');
         }
@@ -144,6 +154,77 @@ class Home extends \Phpcmf\App
         }
 
         return null;
+    }
+
+    private function resolveSkuPrice(array $product, array $shop, $sku)
+    {
+        $sku = trim((string)$sku);
+        if ($sku === '') {
+            return null;
+        }
+
+        $field = !empty($shop['sku_price_field']) ? $shop['sku_price_field'] : 'sku_price_text';
+        $items = $this->parseSkuPrices((string)($product[$field] ?? ''));
+        if (!$items) {
+            return null;
+        }
+
+        foreach ($items as $item) {
+            if (strcasecmp($item['name'], $sku) === 0) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
+    private function parseSkuPrices($raw)
+    {
+        $raw = trim((string)$raw);
+        if ($raw === '') {
+            return [];
+        }
+
+        $items = [];
+        $decoded = json_decode($raw, true);
+        if (is_array($decoded)) {
+            foreach ($decoded as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+                $name = trim((string)($row['name'] ?? $row['sku'] ?? ''));
+                $before = (float)($row['before'] ?? $row['coupon_before_price'] ?? $row['original_price'] ?? 0);
+                $after = (float)($row['after'] ?? $row['coupon_after_price'] ?? $row['price'] ?? 0);
+                if ($name !== '' && $after > 0) {
+                    $items[] = ['name' => $name, 'before' => $before > 0 ? $before : $after, 'after' => $after];
+                }
+            }
+            return $items;
+        }
+
+        foreach (preg_split('/\r\n|\r|\n/', $raw) as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+
+            $parts = array_map('trim', preg_split('/[|,，\t]+/', $line));
+            if (count($parts) < 3) {
+                $parts = array_map('trim', preg_split('/\s+/', $line));
+            }
+            if (count($parts) < 3) {
+                continue;
+            }
+
+            $name = (string)$parts[0];
+            $before = (float)$parts[1];
+            $after = (float)$parts[2];
+            if ($name !== '' && $after > 0) {
+                $items[] = ['name' => $name, 'before' => $before > 0 ? $before : $after, 'after' => $after];
+            }
+        }
+
+        return $items;
     }
 
     private function resolvePayType($payType, array $payConfig)

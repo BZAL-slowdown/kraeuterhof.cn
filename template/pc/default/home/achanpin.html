@@ -51,6 +51,80 @@ $shop_alipay_enabled = !empty($shop_alipay_config['enabled'])
     && is_file($shop_alipay_private_key)
     && !empty($shop_alipay_config['alipay_public_key'])
     && is_file($shop_alipay_config['alipay_public_key']);
+
+$shop_format_price = function ($value) {
+    return number_format(max(0, (float)$value), 2, '.', '');
+};
+$shop_coupon_before = !empty($coupon_before_price) ? (float)$coupon_before_price : 0;
+$shop_coupon_after = !empty($coupon_after_price) ? (float)$coupon_after_price : (!empty($price) ? (float)$price : 0);
+$shop_sku_prices = [];
+$shop_sku_price_raw = isset($sku_price_text) ? trim((string)$sku_price_text) : '';
+if ($shop_sku_price_raw !== '') {
+    $shop_sku_json = json_decode($shop_sku_price_raw, true);
+    if (is_array($shop_sku_json)) {
+        foreach ($shop_sku_json as $shop_sku_row) {
+            if (!is_array($shop_sku_row)) {
+                continue;
+            }
+            $shop_sku_name = trim((string)($shop_sku_row['name'] ?? $shop_sku_row['sku'] ?? ''));
+            $shop_sku_before = (float)($shop_sku_row['before'] ?? $shop_sku_row['coupon_before_price'] ?? $shop_sku_row['original_price'] ?? 0);
+            $shop_sku_after = (float)($shop_sku_row['after'] ?? $shop_sku_row['coupon_after_price'] ?? $shop_sku_row['price'] ?? 0);
+            if ($shop_sku_name !== '' && $shop_sku_after > 0) {
+                $shop_sku_prices[strtolower($shop_sku_name)] = [
+                    'name' => $shop_sku_name,
+                    'before' => $shop_sku_before > 0 ? $shop_sku_before : $shop_sku_after,
+                    'after' => $shop_sku_after,
+                ];
+            }
+        }
+    } else {
+        foreach (preg_split('/\r\n|\r|\n/', $shop_sku_price_raw) as $shop_sku_line) {
+            $shop_sku_line = trim($shop_sku_line);
+            if ($shop_sku_line === '') {
+                continue;
+            }
+            $shop_sku_parts = array_map('trim', preg_split('/[|,，\t]+/', $shop_sku_line));
+            if (count($shop_sku_parts) < 3) {
+                $shop_sku_parts = array_map('trim', preg_split('/\s+/', $shop_sku_line));
+            }
+            if (count($shop_sku_parts) < 3) {
+                continue;
+            }
+            $shop_sku_name = (string)$shop_sku_parts[0];
+            $shop_sku_before = (float)$shop_sku_parts[1];
+            $shop_sku_after = (float)$shop_sku_parts[2];
+            if ($shop_sku_name !== '' && $shop_sku_after > 0) {
+                $shop_sku_prices[strtolower($shop_sku_name)] = [
+                    'name' => $shop_sku_name,
+                    'before' => $shop_sku_before > 0 ? $shop_sku_before : $shop_sku_after,
+                    'after' => $shop_sku_after,
+                ];
+            }
+        }
+    }
+}
+$shop_sku_items = [];
+if (!empty($jinghanliang) && is_array($jinghanliang)) {
+    foreach ($jinghanliang as $shop_capacity) {
+        $shop_sku_name = trim((string)($shop_capacity[1] ?? $shop_capacity['name'] ?? ''));
+        if ($shop_sku_name === '') {
+            continue;
+        }
+        $shop_sku_key = strtolower($shop_sku_name);
+        $shop_sku_items[] = $shop_sku_prices[$shop_sku_key] ?? [
+            'name' => $shop_sku_name,
+            'before' => $shop_coupon_before > 0 ? $shop_coupon_before : $shop_coupon_after,
+            'after' => $shop_coupon_after,
+        ];
+    }
+} elseif ($shop_sku_prices) {
+    $shop_sku_items = array_values($shop_sku_prices);
+}
+$shop_selected_price = $shop_sku_items ? $shop_sku_items[0] : [
+    'name' => '',
+    'before' => $shop_coupon_before > 0 ? $shop_coupon_before : $shop_coupon_after,
+    'after' => $shop_coupon_after,
+];
 ?>
 <main class="bg-gray-100">
     <div class="w-full mx-auto">
@@ -70,19 +144,24 @@ $shop_alipay_enabled = !empty($shop_alipay_config['enabled'])
               {$title}
             </h1>
             <p class="text-gray-dark text-lg sye">{$yingwenming}</p>
-            {if $price}
+            <?php if (!empty($shop_selected_price['after'])) { ?>
             <div class="mt-4 inline-flex items-baseline gap-2 rounded-full bg-primary/5 px-4 py-2">
               <span class="text-sm text-gray-500">售价</span>
-              <span class="text-2xl font-semibold text-primary">￥{dr_price_value($price)}</span>
+              <span id="shopSalePrice" class="text-2xl font-semibold text-primary">￥<?php echo $shop_format_price($shop_selected_price['after']); ?></span>
             </div>
-            {/if}
+            <?php } ?>
           </div>
           
           <!-- 产品图片 -->
           <div class="mb-6">
-            <img src="{THEME_PATH}/am/img/113.png" 
-                 alt="产品图片" 
-                 class="product-image w-full h-auto object-cover">
+            <div id="shopCouponBanner" class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-700 via-red-600 to-red-500 px-8 py-8 text-white shadow-lg">
+              <div class="absolute inset-0 opacity-20" style="background-image:url('{THEME_PATH}/am/img/113.png');background-size:cover;background-position:center;"></div>
+              <div class="relative flex flex-wrap items-end justify-center gap-4">
+                <span class="text-2xl md:text-3xl">券后￥</span>
+                <span id="shopCouponAfterPrice" class="text-6xl md:text-7xl font-bold leading-none"><?php echo $shop_format_price($shop_selected_price['after']); ?></span>
+                <span class="pb-2 text-xl md:text-2xl">优惠前￥<span id="shopCouponBeforePrice"><?php echo $shop_format_price($shop_selected_price['before']); ?></span>起</span>
+              </div>
+            </div>
           </div>
           
           <!-- 产品描述 -->
@@ -96,9 +175,15 @@ $shop_alipay_enabled = !empty($shop_alipay_config['enabled'])
           <div class="mb-8 pt-2 border-t border-gray-medium">
   <div class="flex items-center gap-3">
     <p class="text-lg font-medium">净含量：</p>
-    {loop $jinghanliang $v}
-    <button class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors">{$v[1]}</button>
-{/loop}
+    <?php foreach ($shop_sku_items as $shop_sku_index => $shop_sku_item) { ?>
+    <button type="button"
+            class="shop-sku-option px-3 py-1 border rounded-md transition-colors <?php echo $shop_sku_index === 0 ? 'border-primary bg-primary/5 text-primary' : 'border-gray-300 hover:bg-gray-100'; ?>"
+            data-sku-name="<?php echo htmlspecialchars($shop_sku_item['name'], ENT_QUOTES, 'UTF-8'); ?>"
+            data-sku-before="<?php echo $shop_format_price($shop_sku_item['before']); ?>"
+            data-sku-after="<?php echo $shop_format_price($shop_sku_item['after']); ?>">
+        <?php echo htmlspecialchars($shop_sku_item['name'], ENT_QUOTES, 'UTF-8'); ?>
+    </button>
+    <?php } ?>
   </div>
 </div>
           
@@ -121,7 +206,7 @@ $shop_alipay_enabled = !empty($shop_alipay_config['enabled'])
           <!-- 数量选择器 -->
           <form id="shopOrderForm" method="post" action="{SITE_URL}index.php?s=shop&c=home&m=create" class="space-y-4">
           <input type="hidden" name="product_id" value="{$id}">
-          <input type="hidden" name="sku" id="shopSkuValue" value="">
+          <input type="hidden" name="sku" id="shopSkuValue" value="<?php echo htmlspecialchars($shop_selected_price['name'], ENT_QUOTES, 'UTF-8'); ?>">
           <input type="hidden" name="pay_type" id="shopPayTypeValue" value="{if $shop_wechat_enabled}wechat_h5{elseif $shop_alipay_enabled}alipay_wap{/if}">
           <div class="mb-8 flex items-center w-40">
             <label for="quantity" class="mr-4 text-gray-700">数量：</label>
@@ -233,6 +318,40 @@ $shop_alipay_enabled = !empty($shop_alipay_config['enabled'])
 
     const shopPayTypeValue = document.getElementById('shopPayTypeValue');
     const shopOrderForm = document.getElementById('shopOrderForm');
+    const shopSkuValue = document.getElementById('shopSkuValue');
+    const shopSalePrice = document.getElementById('shopSalePrice');
+    const shopCouponAfterPrice = document.getElementById('shopCouponAfterPrice');
+    const shopCouponBeforePrice = document.getElementById('shopCouponBeforePrice');
+
+    function selectShopSku(button) {
+      if (!button) {
+        return;
+      }
+
+      document.querySelectorAll('.shop-sku-option').forEach((option) => {
+        option.classList.remove('border-primary', 'bg-primary/5', 'text-primary');
+        option.classList.add('border-gray-300');
+      });
+
+      button.classList.remove('border-gray-300');
+      button.classList.add('border-primary', 'bg-primary/5', 'text-primary');
+
+      const skuName = button.dataset.skuName || '';
+      const afterPrice = button.dataset.skuAfter || '';
+      const beforePrice = button.dataset.skuBefore || afterPrice;
+      if (shopSkuValue) {
+        shopSkuValue.value = skuName;
+      }
+      if (shopSalePrice && afterPrice) {
+        shopSalePrice.textContent = '￥' + afterPrice;
+      }
+      if (shopCouponAfterPrice && afterPrice) {
+        shopCouponAfterPrice.textContent = afterPrice;
+      }
+      if (shopCouponBeforePrice && beforePrice) {
+        shopCouponBeforePrice.textContent = beforePrice;
+      }
+    }
 
     function syncShopPayType() {
       const checkedPayType = document.querySelector('[data-shop-pay-type]:checked');
@@ -260,11 +379,21 @@ $shop_alipay_enabled = !empty($shop_alipay_config['enabled'])
       }
     });
 
+    document.addEventListener('click', (event) => {
+      const skuButton = event.target.closest('.shop-sku-option');
+      if (skuButton) {
+        selectShopSku(skuButton);
+      }
+    });
+
     if (shopOrderForm) {
       shopOrderForm.addEventListener('submit', syncShopPayType);
     }
 
-    document.addEventListener('DOMContentLoaded', syncShopPayType);
+    document.addEventListener('DOMContentLoaded', () => {
+      syncShopPayType();
+      selectShopSku(document.querySelector('.shop-sku-option.border-primary') || document.querySelector('.shop-sku-option'));
+    });
   </script>
     <!-- 最新产品区域 -->
         <!-- 支付配送信息区域 -->
