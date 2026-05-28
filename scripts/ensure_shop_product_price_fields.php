@@ -152,4 +152,29 @@ foreach ($fieldSettings as $fieldname => $field) {
     }
 }
 
-echo "Done. Please clear XunRui caches and template caches.\n";
+function clear_cache_dir(string $dir): void
+{
+    if (!is_dir($dir)) {
+        return;
+    }
+
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+
+    foreach ($iterator as $file) {
+        if ($file->isFile() || $file->isLink()) {
+            @unlink($file->getPathname());
+        } elseif ($file->isDir()) {
+            @rmdir($file->getPathname());
+        }
+    }
+}
+
+foreach (['template', 'module', 'table', 'config'] as $cacheDir) {
+    clear_cache_dir($root.'/cache/'.$cacheDir);
+    echo "Cleared cache/{$cacheDir}\n";
+}
+
+echo "Done. Please refresh the product edit page.\n";

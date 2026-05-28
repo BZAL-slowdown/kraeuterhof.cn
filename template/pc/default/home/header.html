@@ -79,8 +79,11 @@
 <body class="bg-white text-text-color font-sans leading-[1.6]">
     <!-- 头部区域 -->
 <?php
-$shop_header_display_name = '榴莲要吃三';
-if (!empty($member['uid'])) {
+$shop_header_display_name = '';
+$shop_header_is_normal_member = !empty($member['uid'])
+    && (int)\Phpcmf\Service::L('input')->get_cookie('member_uid') === (int)$member['uid']
+    && !\Phpcmf\Service::L('input')->get_cookie('admin_login_member');
+if ($shop_header_is_normal_member) {
     foreach (['display_name', 'nickname', 'name', 'username', 'phone', 'email'] as $shop_header_member_field) {
         if (!empty($member[$shop_header_member_field])) {
             $shop_header_display_name = (string)$member[$shop_header_member_field];
@@ -113,6 +116,7 @@ $shop_header_display_name = htmlspecialchars($shop_header_display_name, ENT_QUOT
                 </div>
                 <!-- 左侧文字LOGO：md:block 平板/电脑显示，hidden 手机端隐藏 -->
 
+                <?php if ($shop_header_is_normal_member) { ?>
                 <div class="syn md:block hidden text-xl md:text-2xl text-secondary flex items-center syc">
     <?php echo $shop_header_display_name; ?>
 </div>
@@ -120,6 +124,7 @@ $shop_header_display_name = htmlspecialchars($shop_header_display_name, ENT_QUOT
     <!-- 图标图片：ml-2 控制与文字的间距，可按需调整 -->
     <img src="{THEME_PATH}/am/img/jt.png" alt="图标" class="ml-2 w-5 h-5 md:w-6 md:h-6 object-contain">
 </div>
+                <?php } ?>
             </div>
             
             <!-- 中间LOGO图片（手机端也显示，保持不变） -->
