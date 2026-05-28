@@ -102,4 +102,29 @@ class Order extends \Phpcmf\App
         $db->db->table($db->dbprefix('shop_order'))->where('id', $id)->where('pay_status', 0)->delete();
         $this->_json(1, '未支付订单已删除');
     }
+
+    public function delete_unpaid_batch()
+    {
+        $ids = trim((string)\Phpcmf\Service::L('input')->get('ids'));
+        if (!$ids) {
+            $this->_json(0, '请选择要删除的未支付订单');
+        }
+
+        $ids = array_values(array_filter(array_unique(array_map('intval', explode(',', $ids)))));
+        if (!$ids) {
+            $this->_json(0, '请选择要删除的未支付订单');
+        }
+
+        $db = \Phpcmf\Service::M();
+        $deleted = $db->db->table($db->dbprefix('shop_order'))
+            ->whereIn('id', $ids)
+            ->where('pay_status', 0)
+            ->delete();
+
+        if (!$deleted) {
+            $this->_json(0, '没有可删除的未支付订单');
+        }
+
+        $this->_json(1, '已删除所选未支付订单');
+    }
 }
