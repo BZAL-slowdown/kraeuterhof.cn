@@ -79,7 +79,7 @@
                 <a href="javascript:dr_ajax_url('{dr_url('shop/order/ship', ['id'=>$t.id])}');" class="btn btn-xs blue">标记发货</a>
                 {/if}
                 {if !$t.pay_status}
-                <a href="javascript:if(confirm('确定删除这条未支付订单吗？')){dr_ajax_url('{dr_url('shop/order/delete_unpaid', ['id'=>$t.id])}');}" class="btn btn-xs red">删除</a>
+                <a href="{dr_url('shop/order/delete_unpaid', ['id'=>$t.id])}" onclick="if(confirm('确定删除这条未支付订单吗？')){dr_ajax_url(this.href);} return false;" class="btn btn-xs red">删除</a>
                 {/if}
               </td>
             </tr>
