@@ -239,6 +239,19 @@ $shop_alipay_enabled = !empty($shop_alipay_config['enabled'])
       if (checkedPayType && shopPayTypeValue) {
         shopPayTypeValue.value = checkedPayType.value;
       }
+
+      document.querySelectorAll('.shop-pay-option').forEach((option) => {
+        option.classList.remove('border-primary', 'bg-primary/5', 'text-primary');
+        option.classList.add('border-gray-200');
+      });
+
+      if (checkedPayType) {
+        const activeOption = checkedPayType.closest('.shop-pay-option');
+        if (activeOption) {
+          activeOption.classList.remove('border-gray-200');
+          activeOption.classList.add('border-primary', 'bg-primary/5', 'text-primary');
+        }
+      }
     }
 
     document.addEventListener('change', (event) => {
@@ -250,6 +263,8 @@ $shop_alipay_enabled = !empty($shop_alipay_config['enabled'])
     if (shopOrderForm) {
       shopOrderForm.addEventListener('submit', syncShopPayType);
     }
+
+    document.addEventListener('DOMContentLoaded', syncShopPayType);
   </script>
     <!-- 最新产品区域 -->
         <!-- 支付配送信息区域 -->
