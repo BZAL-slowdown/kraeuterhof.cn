@@ -150,6 +150,7 @@ $fieldSettings = [
             'validate' => ['xss' => 1, 'required' => 0, 'formattr' => 'placeholder="例如：81.20"'],
         ],
         'displayorder' => 11,
+        'disabled' => 1,
     ],
     'coupon_after_price' => [
         'name' => '券后价格',
@@ -159,6 +160,7 @@ $fieldSettings = [
             'validate' => ['xss' => 1, 'required' => 0, 'formattr' => 'placeholder="例如：69.00"'],
         ],
         'displayorder' => 12,
+        'disabled' => 1,
     ],
     'sku_price_text' => [
         'name' => '规格价格配置',
@@ -173,6 +175,7 @@ $fieldSettings = [
             ],
         ],
         'displayorder' => 13,
+        'disabled' => 0,
     ],
 ];
 
@@ -184,10 +187,10 @@ foreach ($fieldSettings as $fieldname => $field) {
     $exists = $mysqli->query("SELECT id FROM ".q($mysqli, $fieldTable)." WHERE relatedname='module' AND relatedid={$moduleId} AND fieldname='{$fieldnameSql}' LIMIT 1");
     if ($exists && $exists->num_rows) {
         $row = $exists->fetch_assoc();
-        exec_sql($mysqli, "UPDATE ".q($mysqli, $fieldTable)." SET name='{$name}', fieldtype='{$type}', isedit=1, ismain=1, ismember=1, issystem=0, issearch=0, disabled=0, setting='{$setting}', displayorder=".(int)$field['displayorder']." WHERE id=".(int)$row['id']);
+        exec_sql($mysqli, "UPDATE ".q($mysqli, $fieldTable)." SET name='{$name}', fieldtype='{$type}', isedit=1, ismain=1, ismember=1, issystem=0, issearch=0, disabled=".(int)$field['disabled'].", setting='{$setting}', displayorder=".(int)$field['displayorder']." WHERE id=".(int)$row['id']);
         echo "Updated field {$fieldname}\n";
     } else {
-        exec_sql($mysqli, "INSERT INTO ".q($mysqli, $fieldTable)." (name, fieldname, fieldtype, relatedid, relatedname, isedit, ismain, ismember, issystem, issearch, disabled, setting, displayorder) VALUES ('{$name}', '{$fieldnameSql}', '{$type}', {$moduleId}, 'module', 1, 1, 1, 0, 0, 0, '{$setting}', ".(int)$field['displayorder'].")");
+        exec_sql($mysqli, "INSERT INTO ".q($mysqli, $fieldTable)." (name, fieldname, fieldtype, relatedid, relatedname, isedit, ismain, ismember, issystem, issearch, disabled, setting, displayorder) VALUES ('{$name}', '{$fieldnameSql}', '{$type}', {$moduleId}, 'module', 1, 1, 1, 0, 0, ".(int)$field['disabled'].", '{$setting}', ".(int)$field['displayorder'].")");
         echo "Inserted field {$fieldname}\n";
     }
 }

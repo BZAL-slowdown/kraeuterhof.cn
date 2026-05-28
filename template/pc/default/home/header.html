@@ -80,10 +80,20 @@
     <!-- 头部区域 -->
 <?php
 $shop_header_display_name = '';
+$shop_header_is_admin_preview = false;
+$shop_header_admin_username = '';
+$shop_header_controller = \Phpcmf\Service::C();
+$shop_header_admin = isset($shop_header_controller->admin) && is_array($shop_header_controller->admin) ? $shop_header_controller->admin : [];
+if (!empty($shop_header_admin['username'])) {
+    $shop_header_is_admin_preview = true;
+    $shop_header_admin_username = (string)$shop_header_admin['username'];
+}
 $shop_header_is_normal_member = !empty($member['uid'])
     && (int)\Phpcmf\Service::L('input')->get_cookie('member_uid') === (int)$member['uid']
     && !\Phpcmf\Service::L('input')->get_cookie('admin_login_member');
-if ($shop_header_is_normal_member) {
+if ($shop_header_is_admin_preview) {
+    $shop_header_display_name = $shop_header_admin_username;
+} elseif ($shop_header_is_normal_member) {
     foreach (['display_name', 'nickname', 'name', 'username', 'phone', 'email'] as $shop_header_member_field) {
         if (!empty($member[$shop_header_member_field])) {
             $shop_header_display_name = (string)$member[$shop_header_member_field];
@@ -116,7 +126,7 @@ $shop_header_display_name = htmlspecialchars($shop_header_display_name, ENT_QUOT
                 </div>
                 <!-- 左侧文字LOGO：md:block 平板/电脑显示，hidden 手机端隐藏 -->
 
-                <?php if ($shop_header_is_normal_member) { ?>
+                <?php if ($shop_header_display_name !== '') { ?>
                 <div class="syn md:block hidden text-xl md:text-2xl text-secondary flex items-center syc">
     <?php echo $shop_header_display_name; ?>
 </div>
