@@ -81,4 +81,25 @@ class Order extends \Phpcmf\App
         }
         $this->_json(1, '已标记发货');
     }
+
+    public function delete_unpaid()
+    {
+        $id = (int)\Phpcmf\Service::L('input')->get('id');
+        if (!$id) {
+            $this->_json(0, '订单参数不存在');
+        }
+
+        $db = \Phpcmf\Service::M();
+        $order = $db->db->table($db->dbprefix('shop_order'))->where('id', $id)->get()->getRowArray();
+        if (!$order) {
+            $this->_json(0, '订单不存在');
+        }
+
+        if ((int)$order['pay_status'] === 1) {
+            $this->_json(0, '已支付订单不允许删除，请保留财务记录');
+        }
+
+        $db->db->table($db->dbprefix('shop_order'))->where('id', $id)->where('pay_status', 0)->delete();
+        $this->_json(1, '未支付订单已删除');
+    }
 }
