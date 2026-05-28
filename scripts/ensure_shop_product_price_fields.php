@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Add product price fields used by the Shop H5 checkout.
+ * Add product coupon and SKU price fields used by the Shop H5 checkout.
  *
  * Run from the project root on the production server:
  * php scripts/ensure_shop_product_price_fields.php
@@ -68,6 +68,41 @@ function exec_sql(mysqli $mysqli, string $sql): void
     }
 }
 
+function decode_setting(?string $value): array
+{
+    if (!$value) {
+        return [];
+    }
+
+    $decoded = json_decode($value, true);
+    return is_array($decoded) ? $decoded : [];
+}
+
+function encode_setting(array $value): string
+{
+    return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+function clear_cache_dir(string $dir): void
+{
+    if (!is_dir($dir)) {
+        return;
+    }
+
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+
+    foreach ($iterator as $file) {
+        if ($file->isFile() || $file->isLink()) {
+            @unlink($file->getPathname());
+        } elseif ($file->isDir()) {
+            @rmdir($file->getPathname());
+        }
+    }
+}
+
 $productTable = $prefix.'1_cp';
 $moduleTable = $prefix.'module';
 $fieldTable = $prefix.'field';
@@ -82,9 +117,9 @@ if (!table_exists($mysqli, $moduleTable) || !table_exists($mysqli, $fieldTable))
 }
 
 $columns = [
-    'coupon_before_price' => "DECIMAL(10,2) NOT NULL DEFAULT '0.00' COMMENT '优惠前价格'",
-    'coupon_after_price' => "DECIMAL(10,2) NOT NULL DEFAULT '0.00' COMMENT '券后价格'",
-    'sku_price_text' => "TEXT NULL COMMENT '规格价格配置：规格|优惠前价|券后价'",
+    'coupon_before_price' => "DECIMAL(10,2) NOT NULL DEFAULT '0.00' COMMENT 'coupon before price'",
+    'coupon_after_price' => "DECIMAL(10,2) NOT NULL DEFAULT '0.00' COMMENT 'coupon after price'",
+    'sku_price_text' => "TEXT NULL COMMENT 'sku price config'",
 ];
 
 $after = column_exists($mysqli, $productTable, 'price') ? 'price' : 'description';
@@ -112,7 +147,7 @@ $fieldSettings = [
         'fieldtype' => 'Text',
         'setting' => [
             'option' => ['width' => 150, 'fieldtype' => 'DECIMAL', 'fieldlength' => '10,2', 'value' => ''],
-            'validate' => ['xss' => 1, 'required' => 0, 'formattr' => ''],
+            'validate' => ['xss' => 1, 'required' => 0, 'formattr' => 'placeholder="例如：81.20"'],
         ],
         'displayorder' => 11,
     ],
@@ -121,7 +156,7 @@ $fieldSettings = [
         'fieldtype' => 'Text',
         'setting' => [
             'option' => ['width' => 150, 'fieldtype' => 'DECIMAL', 'fieldlength' => '10,2', 'value' => ''],
-            'validate' => ['xss' => 1, 'required' => 0, 'formattr' => ''],
+            'validate' => ['xss' => 1, 'required' => 0, 'formattr' => 'placeholder="例如：69.00"'],
         ],
         'displayorder' => 12,
     ],
@@ -130,7 +165,12 @@ $fieldSettings = [
         'fieldtype' => 'Textarea',
         'setting' => [
             'option' => ['width' => '80%', 'height' => 120, 'fieldtype' => 'TEXT', 'fieldlength' => '', 'value' => ''],
-            'validate' => ['xss' => 1, 'required' => 0, 'formattr' => 'placeholder="每行一个规格：100ML|81.20|69.00"'],
+            'validate' => [
+                'xss' => 1,
+                'required' => 0,
+                'formattr' => 'placeholder="每行一个规格：100ml|81.20|69.00"',
+                'tips' => '每行一个规格：规格名称|优惠前价格|券后价格，例如 100ml|81.20|69.00',
+            ],
         ],
         'displayorder' => 13,
     ],
@@ -139,7 +179,7 @@ $fieldSettings = [
 foreach ($fieldSettings as $fieldname => $field) {
     $name = $mysqli->real_escape_string($field['name']);
     $type = $mysqli->real_escape_string($field['fieldtype']);
-    $setting = $mysqli->real_escape_string(json_encode($field['setting'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    $setting = $mysqli->real_escape_string(encode_setting($field['setting']));
     $fieldnameSql = $mysqli->real_escape_string($fieldname);
     $exists = $mysqli->query("SELECT id FROM ".q($mysqli, $fieldTable)." WHERE relatedname='module' AND relatedid={$moduleId} AND fieldname='{$fieldnameSql}' LIMIT 1");
     if ($exists && $exists->num_rows) {
@@ -152,24 +192,34 @@ foreach ($fieldSettings as $fieldname => $field) {
     }
 }
 
-function clear_cache_dir(string $dir): void
-{
-    if (!is_dir($dir)) {
-        return;
+// Some XunRui category settings store a field whitelist. If present, extend it.
+foreach ([$prefix.'1_share_category', $prefix.'1_cp_category'] as $categoryTable) {
+    if (!table_exists($mysqli, $categoryTable)) {
+        continue;
     }
 
-    $iterator = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
-        RecursiveIteratorIterator::CHILD_FIRST
-    );
+    $rs = $mysqli->query("SELECT id, setting FROM ".q($mysqli, $categoryTable)." WHERE module='cp' OR mid='cp' OR dirname='cp'");
+    if (!$rs) {
+        $rs = $mysqli->query("SELECT id, setting FROM ".q($mysqli, $categoryTable));
+    }
 
-    foreach ($iterator as $file) {
-        if ($file->isFile() || $file->isLink()) {
-            @unlink($file->getPathname());
-        } elseif ($file->isDir()) {
-            @rmdir($file->getPathname());
+    $changed = 0;
+    while ($row = $rs ? $rs->fetch_assoc() : null) {
+        $setting = decode_setting($row['setting'] ?? '');
+        if (!$setting || !isset($setting['module_field']) || !is_array($setting['module_field'])) {
+            continue;
         }
+
+        foreach (array_keys($fieldSettings) as $fieldname) {
+            $setting['module_field'][$fieldname] = 1;
+        }
+
+        $encoded = $mysqli->real_escape_string(encode_setting($setting));
+        exec_sql($mysqli, "UPDATE ".q($mysqli, $categoryTable)." SET setting='{$encoded}' WHERE id=".(int)$row['id']);
+        $changed++;
     }
+
+    echo "Updated category field whitelist {$categoryTable}: {$changed}\n";
 }
 
 foreach (['template', 'module', 'table', 'config'] as $cacheDir) {
@@ -177,4 +227,31 @@ foreach (['template', 'module', 'table', 'config'] as $cacheDir) {
     echo "Cleared cache/{$cacheDir}\n";
 }
 
-echo "Done. Please refresh the product edit page.\n";
+$dataCachePatterns = [
+    'table-*.cache',
+    'table-field.cache',
+    'module-*.cache',
+    'form-*.cache',
+    'urlrule.cache',
+];
+foreach ($dataCachePatterns as $pattern) {
+    foreach (glob($root.'/cache/data/'.$pattern) ?: [] as $cacheFile) {
+        @unlink($cacheFile);
+        echo 'Removed cache/data/'.basename($cacheFile)."\n";
+    }
+}
+
+echo "\nVerification:\n";
+foreach (array_keys($fieldSettings) as $fieldname) {
+    $columnOk = column_exists($mysqli, $productTable, $fieldname) ? 'COLUMN OK' : 'NO COLUMN';
+    $fieldnameSql = $mysqli->real_escape_string($fieldname);
+    $fieldOk = 'NO FIELD';
+    $rs = $mysqli->query("SELECT id, name, disabled FROM ".q($mysqli, $fieldTable)." WHERE relatedname='module' AND relatedid={$moduleId} AND fieldname='{$fieldnameSql}' LIMIT 1");
+    if ($rs && $rs->num_rows) {
+        $row = $rs->fetch_assoc();
+        $fieldOk = 'FIELD OK #'.$row['id'].' '.$row['name'].' disabled='.$row['disabled'];
+    }
+    echo "{$fieldname}: {$columnOk}; {$fieldOk}\n";
+}
+
+echo "\nDone. Open admin product edit page, then use System Cache > update cache if the fields are still not visible.\n";
