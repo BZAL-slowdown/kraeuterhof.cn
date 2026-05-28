@@ -78,6 +78,7 @@
               </td>
               <td>{dr_date($t.created_at, 'Y-m-d H:i')}</td>
               <td>
+                <a href="{dr_url('shop/order/detail', ['id'=>$t.id])}" class="btn btn-xs default">详情</a>
                 {if !$t.pay_status && $allow_admin_mark_paid}
                 <a href="javascript:dr_ajax_url('{dr_url('shop/order/mark_paid', ['id'=>$t.id])}');" class="btn btn-xs green">测试标记已支付</a>
                 {/if}

@@ -1,0 +1,58 @@
+{template "header.html"}
+<div class="page-content">
+  <div class="portlet light bordered">
+    <div class="portlet-title">
+      <div class="caption"><i class="fa fa-file-text-o"></i> 订单详情</div>
+      <div class="actions">
+        <a href="{dr_url('shop/order/index')}" class="btn default btn-sm"><i class="fa fa-arrow-left"></i> 返回订单列表</a>
+      </div>
+    </div>
+    <div class="portlet-body">
+      <h4 class="form-section">基础信息</h4>
+      <table class="table table-bordered table-striped">
+        <tbody>
+          <tr><th style="width:180px">订单号</th><td>{$order.out_trade_no}</td></tr>
+          <tr><th>会员ID</th><td>{$order.uid}</td></tr>
+          <tr><th>下单时间</th><td>{dr_date($order.created_at, 'Y-m-d H:i:s')}</td></tr>
+          <tr><th>更新时间</th><td>{dr_date($order.updated_at, 'Y-m-d H:i:s')}</td></tr>
+          <tr><th>客户端 IP</th><td>{$order.client_ip}</td></tr>
+        </tbody>
+      </table>
+
+      <h4 class="form-section">商品信息</h4>
+      <table class="table table-bordered table-striped">
+        <tbody>
+          <tr><th style="width:180px">商品</th><td>{$order.product_title}</td></tr>
+          <tr><th>商品ID</th><td>{$order.product_id}</td></tr>
+          <tr><th>规格</th><td>{if $order.sku}{$order.sku}{else}-{/if}</td></tr>
+          <tr><th>数量</th><td>{$order.quantity}</td></tr>
+          <tr><th>单价</th><td>￥{$order.unit_price}</td></tr>
+          <tr><th>订单金额</th><td>￥{$order.total_amount}</td></tr>
+          <tr><th>实付金额</th><td>￥{$order.pay_amount}</td></tr>
+        </tbody>
+      </table>
+
+      <h4 class="form-section">收货信息</h4>
+      <table class="table table-bordered table-striped">
+        <tbody>
+          <tr><th style="width:180px">收货人</th><td>{$order.buyer_name}</td></tr>
+          <tr><th>手机号</th><td>{$order.buyer_phone}</td></tr>
+          <tr><th>收货地址</th><td>{$order.buyer_address}</td></tr>
+          <tr><th>备注</th><td>{if $order.remark}{$order.remark}{else}-{/if}</td></tr>
+        </tbody>
+      </table>
+
+      <h4 class="form-section">支付信息</h4>
+      <table class="table table-bordered table-striped">
+        <tbody>
+          <tr><th style="width:180px">支付方式</th><td>{$pay_type_name}</td></tr>
+          <tr><th>支付状态</th><td>{$pay_status_name}</td></tr>
+          <tr><th>订单状态</th><td>{$order_status_name}</td></tr>
+          <tr><th>交易流水号</th><td>{if $order.transaction_id}{$order.transaction_id}{else}-{/if}</td></tr>
+          <tr><th>付款时间</th><td>{if $order.paid_at}{dr_date($order.paid_at, 'Y-m-d H:i:s')}{else}-{/if}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{template "footer.html"}

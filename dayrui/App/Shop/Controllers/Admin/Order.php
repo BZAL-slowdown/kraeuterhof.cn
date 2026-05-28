@@ -127,4 +127,46 @@ class Order extends \Phpcmf\App
 
         $this->_json(1, '已删除所选未支付订单');
     }
+
+    public function detail()
+    {
+        $id = (int)\Phpcmf\Service::L('input')->get('id');
+        if (!$id) {
+            $this->_msg(0, '订单参数不存在');
+        }
+
+        $db = \Phpcmf\Service::M();
+        $order = $db->db->table($db->dbprefix('shop_order'))->where('id', $id)->get()->getRowArray();
+        if (!$order) {
+            $this->_msg(0, '订单不存在');
+        }
+
+        \Phpcmf\Service::V()->assign([
+            'order' => $order,
+            'pay_type_name' => $this->payTypeName((string)$order['pay_type']),
+            'pay_status_name' => (int)$order['pay_status'] === 1 ? '已支付' : '未支付',
+            'order_status_name' => $this->orderStatusName((int)$order['order_status']),
+        ]);
+        \Phpcmf\Service::V()->display('order_detail.html');
+    }
+
+    private function payTypeName($payType)
+    {
+        $map = [
+            'wechat_h5' => '微信支付',
+            'alipay_wap' => '支付宝支付',
+        ];
+        return $map[$payType] ?? $payType;
+    }
+
+    private function orderStatusName($status)
+    {
+        if ($status === 2) {
+            return '已发货';
+        }
+        if ($status === 1) {
+            return '待发货';
+        }
+        return '待支付';
+    }
 }
