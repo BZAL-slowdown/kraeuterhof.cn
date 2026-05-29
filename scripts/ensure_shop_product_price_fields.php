@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Add product coupon and SKU price fields used by the Shop H5 checkout.
+ * Add product coupon, SKU price and coupon-background fields used by the shop.
  *
  * Run from the project root on the production server:
  * php scripts/ensure_shop_product_price_fields.php
@@ -36,7 +36,7 @@ if (strpos($host, ':') !== false) {
 
 $mysqli = new mysqli($host, (string)$config['username'], (string)($config['password'] ?? ''), (string)$config['database'], $port);
 if ($mysqli->connect_errno) {
-    fwrite(STDERR, "Connect failed: ".$mysqli->connect_error."\n");
+    fwrite(STDERR, 'Connect failed: '.$mysqli->connect_error."\n");
     exit(1);
 }
 $mysqli->set_charset('utf8mb4');
@@ -63,7 +63,7 @@ function column_exists(mysqli $mysqli, string $table, string $column): bool
 function exec_sql(mysqli $mysqli, string $sql): void
 {
     if (!$mysqli->query($sql)) {
-        fwrite(STDERR, "SQL failed: ".$mysqli->error."\n".$sql."\n");
+        fwrite(STDERR, 'SQL failed: '.$mysqli->error."\n".$sql."\n");
         exit(1);
     }
 }
@@ -101,6 +101,24 @@ function clear_cache_dir(string $dir): void
             @rmdir($file->getPathname());
         }
     }
+}
+
+function read_json_file(string $file): array
+{
+    if (!is_file($file)) {
+        return [];
+    }
+    $data = json_decode((string)file_get_contents($file), true);
+    return is_array($data) ? $data : [];
+}
+
+function write_json_file(string $file, array $data): void
+{
+    $dir = dirname($file);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0777, true);
+    }
+    file_put_contents($file, encode_setting($data));
 }
 
 $productTable = $prefix.'1_cp';
@@ -200,6 +218,7 @@ $fieldSettings = [
     ],
 ];
 
+$fieldRows = [];
 foreach ($fieldSettings as $fieldname => $field) {
     $name = $mysqli->real_escape_string($field['name']);
     $type = $mysqli->real_escape_string($field['fieldtype']);
@@ -214,6 +233,13 @@ foreach ($fieldSettings as $fieldname => $field) {
         exec_sql($mysqli, "INSERT INTO ".q($mysqli, $fieldTable)." (name, fieldname, fieldtype, relatedid, relatedname, isedit, ismain, ismember, issystem, issearch, disabled, setting, displayorder) VALUES ('{$name}', '{$fieldnameSql}', '{$type}', {$moduleId}, 'module', 1, 1, 1, 0, 0, ".(int)$field['disabled'].", '{$setting}', ".(int)$field['displayorder'].")");
         echo "Inserted field {$fieldname}\n";
     }
+
+    $rs = $mysqli->query("SELECT * FROM ".q($mysqli, $fieldTable)." WHERE relatedname='module' AND relatedid={$moduleId} AND fieldname='{$fieldnameSql}' LIMIT 1");
+    if ($rs && $rs->num_rows) {
+        $row = $rs->fetch_assoc();
+        $row['setting'] = decode_setting($row['setting'] ?? '');
+        $fieldRows[$fieldname] = $row;
+    }
 }
 
 // Some XunRui category settings store a field whitelist. If present, extend it.
@@ -222,11 +248,7 @@ foreach ([$prefix.'1_share_category', $prefix.'1_cp_category'] as $categoryTable
         continue;
     }
 
-    $rs = $mysqli->query("SELECT id, setting FROM ".q($mysqli, $categoryTable)." WHERE module='cp' OR mid='cp' OR dirname='cp'");
-    if (!$rs) {
-        $rs = $mysqli->query("SELECT id, setting FROM ".q($mysqli, $categoryTable));
-    }
-
+    $rs = $mysqli->query("SELECT id, setting FROM ".q($mysqli, $categoryTable));
     $changed = 0;
     while ($row = $rs ? $rs->fetch_assoc() : null) {
         $setting = decode_setting($row['setting'] ?? '');
@@ -235,7 +257,9 @@ foreach ([$prefix.'1_share_category', $prefix.'1_cp_category'] as $categoryTable
         }
 
         foreach (array_keys($fieldSettings) as $fieldname) {
-            $setting['module_field'][$fieldname] = 1;
+            if ((int)$fieldSettings[$fieldname]['disabled'] === 0) {
+                $setting['module_field'][$fieldname] = 1;
+            }
         }
 
         $encoded = $mysqli->real_escape_string(encode_setting($setting));
@@ -251,6 +275,36 @@ foreach (['template', 'table', 'config'] as $cacheDir) {
     echo "Cleared cache/{$cacheDir}\n";
 }
 
+$moduleCacheFile = $root.'/cache/data/module-1-cp.cache';
+$moduleCache = read_json_file($moduleCacheFile);
+if ($moduleCache) {
+    if (!isset($moduleCache['field']) || !is_array($moduleCache['field'])) {
+        $moduleCache['field'] = [];
+    }
+
+    foreach ($fieldRows as $fieldname => $row) {
+        if ((int)($row['disabled'] ?? 0) === 0) {
+            $moduleCache['field'][$fieldname] = $row;
+        } else {
+            unset($moduleCache['field'][$fieldname]);
+        }
+    }
+
+    uasort($moduleCache['field'], static function ($a, $b) {
+        $ao = (int)($a['displayorder'] ?? 0);
+        $bo = (int)($b['displayorder'] ?? 0);
+        if ($ao === $bo) {
+            return (int)($a['id'] ?? 0) <=> (int)($b['id'] ?? 0);
+        }
+        return $ao <=> $bo;
+    });
+
+    write_json_file($moduleCacheFile, $moduleCache);
+    echo "Patched cache/data/module-1-cp.cache with sku_price_text and coupon_bg_image\n";
+} else {
+    echo "Skipped cache/data/module-1-cp.cache patch because the cache file is missing or invalid\n";
+}
+
 $dataCachePatterns = [
     'table-*.cache',
     'table-field.cache',
@@ -261,7 +315,7 @@ foreach ($dataCachePatterns as $pattern) {
         echo 'Removed cache/data/'.basename($cacheFile)."\n";
     }
 }
-echo "Skipped cache/data/module-*.cache to avoid breaking app routing. Use admin System Cache > Update Cache when module cache refresh is needed.\n";
+echo "Kept cache/data/module-*.cache and patched module-1-cp.cache directly to avoid breaking routing.\n";
 
 echo "\nVerification:\n";
 foreach (array_keys($fieldSettings) as $fieldname) {
@@ -276,4 +330,8 @@ foreach (array_keys($fieldSettings) as $fieldname) {
     echo "{$fieldname}: {$columnOk}; {$fieldOk}\n";
 }
 
-echo "\nDone. Open admin product edit page, then use System Cache > Update Cache if the fields are still not visible.\n";
+$patchedCache = read_json_file($moduleCacheFile);
+echo 'module-1-cp.cache sku_price_text: '.(isset($patchedCache['field']['sku_price_text']) ? 'OK' : 'MISSING')."\n";
+echo 'module-1-cp.cache coupon_bg_image: '.(isset($patchedCache['field']['coupon_bg_image']) ? 'OK' : 'MISSING')."\n";
+
+echo "\nDone. Reopen the admin product edit page or hard-refresh it.\n";
