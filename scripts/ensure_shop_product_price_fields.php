@@ -120,6 +120,7 @@ $columns = [
     'coupon_before_price' => "DECIMAL(10,2) NOT NULL DEFAULT '0.00' COMMENT 'coupon before price'",
     'coupon_after_price' => "DECIMAL(10,2) NOT NULL DEFAULT '0.00' COMMENT 'coupon after price'",
     'sku_price_text' => "TEXT NULL COMMENT 'sku price config'",
+    'coupon_bg_image' => "VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'coupon background image'",
 ];
 
 $after = column_exists($mysqli, $productTable, 'price') ? 'price' : 'description';
@@ -175,6 +176,16 @@ $fieldSettings = [
             ],
         ],
         'displayorder' => 13,
+        'disabled' => 0,
+    ],
+    'coupon_bg_image' => [
+        'name' => '优惠券底纹图',
+        'fieldtype' => 'File',
+        'setting' => [
+            'option' => ['ext' => 'jpg,jpeg,png,gif,webp', 'size' => 10, 'width' => 400, 'fieldtype' => 'VARCHAR', 'fieldlength' => '255'],
+            'validate' => ['required' => 0, 'xss' => 1, 'tips' => '上传后会作为商品详情页红色优惠券区域的底纹；不上传时使用默认红色渐变。'],
+        ],
+        'displayorder' => 14,
         'disabled' => 0,
     ],
 ];

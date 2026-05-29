@@ -54,7 +54,9 @@
                         <div class="overflow-hidden transition-shadow duration-300 hover-lift">
                             <!-- 父容器添加 flex 居中属性，图片自适应居中 -->
 <div class="bg-white w-full h-56 md:h-[350px] flex items-center justify-center">
-    <img src="{dr_get_file($t.thumb)}" alt="金枕榴莲" class="h-48 md:h-[250px] object-contain">
+    <a href="{$t.url}" class="flex h-full w-full items-center justify-center" aria-label="查看{$t.title}">
+        <img src="{dr_get_file($t.thumb)}" alt="{$t.title}" class="h-48 md:h-[250px] object-contain transition-transform duration-300 hover:scale-105">
+    </a>
 </div>
                             <div class="p-3.5">
                                 <div class="text-[#3d3d3d] text-sm md:text-lg mb-1 text-center sye">{$t.yingwenming}</div>
