@@ -1,172 +1,137 @@
 {template "header.html"}
 <main class="bg-white">
     <div class="w-full mx-auto">
-        <!-- 顶部大图区域 -->
         <div class="hidden md:block relative w-full h-[300px] md:h-[500px] mb-8">
-            <!-- 顶部满屏图片 -->
-            <img src="{dr_get_file($cat.lanmudatu)}" 
-                 alt="顶部大图" 
+            <img src="{dr_get_file($cat.lanmudatu)}"
+                 alt="顶部大图"
                  class="w-full h-full object-cover">
-            
-            <!-- 左侧带白边图片（覆盖50%在顶部图片上） -->
-<div class="absolute md:bottom-[-40%] left-4 md:left-44 w-1/3 md:w-1/5 z-10">
-    <img src="{dr_get_file($cat.lanmuertu)}" 
-         alt="左侧图片" 
-         class="w-full md:h-[400px] border-8 border-gray-200 shadow-lg">
-</div>
-            
-            <!-- 右侧标题区域 -->
+
+            <div class="absolute md:bottom-[-40%] left-4 md:left-44 w-1/3 md:w-1/5 z-10">
+                <img src="{dr_get_file($cat.lanmuertu)}"
+                     alt="栏目图片"
+                     class="w-full md:h-[400px] border-8 border-gray-200 shadow-lg">
+            </div>
+
             <div class="absolute -bottom-1/4 right-4 md:right-44 w-1/2 md:w-2/5 z-10">
                 <h2 class="text-2xl md:text-4xl text-gray-900 mb-2 text-right sye">{$cat.lmywm}</h2>
                 <p class="text-lg md:text-xl text-gray-700 text-right syc">{$cat.name}</p>
             </div>
-            
         </div>
-        <div class="block md:hidden relative w-full h-[300px] md:h-[500px]">
-            <!-- 顶部满屏图片 -->
-            <img src="{dr_get_file($cat.lanmudatu)}" 
-                 alt="顶部大图" 
-                 class="w-full h-full object-cover">
-            
-            
 
-                <h2 class="text-2xl md:text-4xl text-gray-900 mb-2 text-center sye">{$cat.lmywm}</h2>
-                <p class="text-lg md:text-xl text-gray-700 text-center syc">{$cat.name}</p>
-            
+        <div class="block md:hidden relative w-full h-[300px] md:h-[500px]">
+            <img src="{dr_get_file($cat.lanmudatu)}"
+                 alt="顶部大图"
+                 class="w-full h-full object-cover">
+            <h2 class="text-2xl md:text-4xl text-gray-900 mb-2 text-center sye">{$cat.lmywm}</h2>
+            <p class="text-lg md:text-xl text-gray-700 text-center syc">{$cat.name}</p>
         </div>
-        
-        <!-- 4个名片区域（一行两个） -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-20 md:mt-60 max-w-7xl mx-auto">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-20 md:mt-60 max-w-7xl mx-auto px-4">
             {category module=share pid=11 num=10 order=displayorder}
-            <!-- 名片1 -->
             <div class="flex bg-gray-100 overflow-hidden shadow-md">
-                <div class="w-2/5 flex items-center justify-center">
-    <img src="{dr_get_file($t.thumb)}" 
-         alt="产品图片" 
-         class="md:w-full md:h-full w-32 h-40 object-fit">
-</div>
+                <a href="{$t.url}" class="w-2/5 flex items-center justify-center" aria-label="查看{$t.name}">
+                    <img src="{dr_get_file($t.thumb)}"
+                         alt="产品图片"
+                         class="md:w-full md:h-full w-32 h-40 object-contain transition-transform duration-300 hover:scale-105">
+                </a>
                 <div class="w-3/5 p-4 flex flex-col justify-center items-center text-center">
-    <p class="text-xl md:text-2xl sybold text-gray-700 mb-2 sye">{$t.lmywm}</p>
-    <p class="text-lg md:text-xl text-gray-600 mb-6 sybold font-bold syc">{$t.name}</p>
-    <a href="{$t.url}" class="inline-flex items-center text-white hover:text-white/80 transition-colors py-2 px-4 border border-primary w-fit bg-primary mt-10 syc">
-        查看更多
-        <i class="fa fa-chevron-right ml-2 text-sm"></i>
-    </a>
+                    <p class="text-xl md:text-2xl sybold text-gray-700 mb-2 sye">{$t.lmywm}</p>
+                    <p class="text-lg md:text-xl text-gray-600 mb-6 sybold font-bold syc">{$t.name}</p>
+                    <a href="{$t.url}" class="inline-flex items-center text-white hover:text-white/80 transition-colors py-2 px-4 border border-primary w-fit bg-primary mt-10 syc">
+                        查看更多
+                        <i class="fa fa-chevron-right ml-2 text-sm"></i>
+                    </a>
                 </div>
             </div>
             {/category}
         </div>
-        
-        <!-- 底部Swiper区域 -->
+
         <div class="mt-16 text-center">
             <div class="mt-20 mb-20">
                 <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-light text-gray-800 tracking-wider sybold sye">
                     Latest Products
                 </h2>
                 <p class="mt-2 text-[clamp(1rem,2vw,1.25rem)] text-gray-600 sybold syc">最新产品</p>
-    </div>
-    <!-- 黑色背景Swiper容器 -->
-    <div class="bg-primary text-white p-8 relative">
-        <!-- 左右箭头 -->
-        <button class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10" id="prevBtn">
-            <i class="fa fa-chevron-left"></i>
-        </button>
-        <button class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10" id="nextBtn">
-            <i class="fa fa-chevron-right"></i>
-        </button>
-        
-        <!-- Swiper内容 -->
-        <div class="flex space-x-7 overflow-x-auto py-4 scrollbar-hide" id="swiperContainer">
-            <!-- Swiper名片1 -->
-            {module module=cp catid=11 num=7 order=displayorder,updatetime}
-            <div class="min-w-[280px] text-gray-900 overflow-hidden flex-shrink-0 swiper-item">
-                <!-- 内容保持不变 -->
-                <div class="bg-white p-2 h-80 flex items-center justify-center">
-    <img src="{dr_get_file($t.thumb)}" 
-         alt="{$t.title}" 
-         class="max-w-full max-h-60 object-contain bg-white">
-</div>
-                <div class="p-4 justify-center items-center text-center">
-                    <h4 class="text-base font-bold mb-2 leading-tight text-white text-center syc">
-                        {$t.yingwenming}
-                    </h4>
-                    <h4 class="text-base font-bold mb-2 leading-tight text-white text-center syc">
-                        {$t.title}
-                    </h4>
-                    {if $t.price}
-                    <div class="text-center text-white/90 text-sm md:text-base font-semibold mb-2">￥{dr_price_value($t.price)}</div>
-                    {/if}
-                    <a href="{$t.url}" class="inline-block bg-white text-primary px-4 py-1.5 text-sm hover:bg-dark transition-colors duration-300 syc">
-        查看更多>
-    </a>
+            </div>
+
+            <div class="bg-primary text-white p-8 relative">
+                <button class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10" id="prevBtn">
+                    <i class="fa fa-chevron-left"></i>
+                </button>
+                <button class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10" id="nextBtn">
+                    <i class="fa fa-chevron-right"></i>
+                </button>
+
+                <div class="flex space-x-7 overflow-x-auto py-4 scrollbar-hide" id="swiperContainer">
+                    {module module=cp catid=11 num=10 order=displayorder,updatetime}
+                    <div class="min-w-[280px] text-gray-900 overflow-hidden flex-shrink-0 swiper-item">
+                        <div class="bg-white p-2 h-80 flex items-center justify-center">
+                            <a href="{$t.url}" class="flex h-full w-full items-center justify-center" aria-label="查看{$t.title}">
+                                <img src="{dr_get_file($t.thumb)}"
+                                     alt="{$t.title}"
+                                     class="max-w-full max-h-60 object-contain bg-white transition-transform duration-300 hover:scale-105">
+                            </a>
+                        </div>
+                        <div class="p-4 justify-center items-center text-center">
+                            <h4 class="text-base font-bold mb-2 leading-tight text-white text-center syc">{$t.yingwenming}</h4>
+                            <h4 class="text-base font-bold mb-2 leading-tight text-white text-center syc">{$t.title}</h4>
+                            {if $t.price}
+                            <div class="text-center text-white/90 text-sm md:text-base font-semibold mb-2">¥ {dr_price_value($t.price)}</div>
+                            {/if}
+                            <a href="{$t.url}" class="inline-block bg-white text-primary px-4 py-1.5 text-sm hover:bg-dark transition-colors duration-300 syc">
+                                查看更多&gt;
+                            </a>
+                        </div>
+                    </div>
+                    {/module}
                 </div>
             </div>
-            {/module}
-            
-            <!-- 继续添加其他名片 -->
         </div>
-    </div>
-</div>
-<style>
-    .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
-}
-</style>
-<script>
-    // 获取元素
-    const swiperContainer = document.getElementById('swiperContainer');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const items = document.querySelectorAll('.swiper-item');
-    
-    // 计算每次滚动距离（单个卡片宽度+间距）
-    const itemWidth = 280 + 28; // 280px宽度 + 7*4px间距（space-x-7对应28px）
-    
-    // 左箭头点击事件
-    prevBtn.addEventListener('click', () => {
-        swiperContainer.scrollBy({
-            left: -itemWidth,
-            behavior: 'smooth'
-        });
-    });
-    
-    // 右箭头点击事件
-    nextBtn.addEventListener('click', () => {
-        swiperContainer.scrollBy({
-            left: itemWidth,
-            behavior: 'smooth'
-        });
-    });
-    
-    // 自动播放功能
-    let autoPlayInterval;
-    function startAutoPlay() {
-        autoPlayInterval = setInterval(() => {
-            // 计算是否滚动到最后
-            const maxScrollLeft = swiperContainer.scrollWidth - swiperContainer.clientWidth;
-            if (swiperContainer.scrollLeft >= maxScrollLeft) {
-                swiperContainer.scrollTo({ left: 0, behavior: 'smooth' });
-            } else {
-                swiperContainer.scrollBy({ left: itemWidth, behavior: 'smooth' });
+
+        <style>
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
             }
-        }, 3000); // 每3秒滚动一次
-    }
-    
-    // 鼠标悬停时暂停自动播放
-    swiperContainer.parentElement.addEventListener('mouseenter', () => {
-        clearInterval(autoPlayInterval);
-    });
-    
-    // 鼠标离开时恢复自动播放
-    swiperContainer.parentElement.addEventListener('mouseleave', startAutoPlay);
-    
-    // 初始化自动播放
-    startAutoPlay();
-</script>
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+        </style>
+        <script>
+            const swiperContainer = document.getElementById('swiperContainer');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const itemWidth = 280 + 28;
+            let autoPlayInterval;
+
+            prevBtn && prevBtn.addEventListener('click', () => {
+                swiperContainer.scrollBy({ left: -itemWidth, behavior: 'smooth' });
+            });
+
+            nextBtn && nextBtn.addEventListener('click', () => {
+                swiperContainer.scrollBy({ left: itemWidth, behavior: 'smooth' });
+            });
+
+            function startAutoPlay() {
+                if (!swiperContainer) {
+                    return;
+                }
+                autoPlayInterval = setInterval(() => {
+                    const maxScrollLeft = swiperContainer.scrollWidth - swiperContainer.clientWidth;
+                    if (swiperContainer.scrollLeft >= maxScrollLeft) {
+                        swiperContainer.scrollTo({ left: 0, behavior: 'smooth' });
+                    } else {
+                        swiperContainer.scrollBy({ left: itemWidth, behavior: 'smooth' });
+                    }
+                }, 3000);
+            }
+
+            if (swiperContainer && swiperContainer.parentElement) {
+                swiperContainer.parentElement.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+                swiperContainer.parentElement.addEventListener('mouseleave', startAutoPlay);
+                startAutoPlay();
+            }
+        </script>
     </div>
 </main>
 

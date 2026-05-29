@@ -182,8 +182,18 @@ $fieldSettings = [
         'name' => '优惠券底纹图',
         'fieldtype' => 'File',
         'setting' => [
-            'option' => ['ext' => 'jpg,jpeg,png,gif,webp', 'size' => 10, 'width' => 400, 'fieldtype' => 'VARCHAR', 'fieldlength' => '255'],
-            'validate' => ['required' => 0, 'xss' => 1, 'tips' => '上传后会作为商品详情页红色优惠券区域的底纹；不上传时使用默认红色渐变。'],
+            'option' => [
+                'ext' => 'jpg,gif,png,jpeg,webp',
+                'size' => 10,
+                'input' => 1,
+                'fieldtype' => 'VARCHAR',
+                'fieldlength' => '255',
+            ],
+            'validate' => [
+                'required' => 0,
+                'xss' => 1,
+                'tips' => '上传后会作为商品详情页优惠券区域的底纹；不上传时使用默认红色渐变。',
+            ],
         ],
         'displayorder' => 14,
         'disabled' => 0,
